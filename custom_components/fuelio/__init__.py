@@ -86,7 +86,7 @@ class FuelioUploadPageView(HomeAssistantView):
 
     url = f"/{PANEL_URL_PATH}"
     name = "fuelio:upload_page"
-    requires_auth = True
+    requires_auth = False
 
     def __init__(self, hass: HomeAssistant) -> None:
         """Initialize the upload page view."""
