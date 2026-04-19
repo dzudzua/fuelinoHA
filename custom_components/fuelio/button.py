@@ -87,10 +87,11 @@ class FuelioButton(CoordinatorEntity[FuelioDataUpdateCoordinator], ButtonEntity)
 
     async def async_show_upload_help(self) -> None:
         """Show upload instructions inside Home Assistant."""
-        upload_url = f"/api/fuelio/upload-page"
+        upload_url = "/api/fuelio/upload-page"
         source_path = self.coordinator.source_path
         message = (
             "Open the Fuelio upload page and upload a CSV export.\n\n"
+            f"[Open Fuelio upload page]({upload_url})\n\n"
             f"Upload page: `{upload_url}`\n"
             f"Configured source path: `{source_path}`\n\n"
             "Recommended workflow: set Fuelio to a folder path and let the "
