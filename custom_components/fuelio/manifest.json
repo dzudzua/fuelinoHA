@@ -3,10 +3,10 @@
   "name": "Fuelio",
   "codeowners": [],
   "config_flow": true,
-  "documentation": "https://github.com/example/fuelino",
-  "integration_type": "service",
+  "documentation": "https://github.com/dzudzua/fuelinoHA",
+  "integration_type": "hub",
   "iot_class": "local_polling",
   "loggers": ["custom_components.fuelio"],
   "requirements": [],
-  "version": "0.1.0"
+  "version": "0.1.4"
 }

@@ -2,6 +2,10 @@
 
 Custom Home Assistant integration for importing Fuelio backup CSV files.
 
+## Version
+
+Current integration version: `0.1.4`
+
 ## Installation
 
 Recommended installation path:
@@ -78,6 +82,14 @@ git push -u origin main
 Then add the repository URL in HACS as a custom integration source.
 
 Do not commit your real Fuelio exports to a public repository. Keep personal CSV backups out of git and only point Home Assistant to local files stored inside your HA config.
+
+## Changelog
+
+- `0.1.4`: simplified config flow compatibility, clearer manifest metadata
+- `0.1.3`: relaxed config flow source validation
+- `0.1.2`: added `fuelio.reload` service
+- `0.1.1`: parser and sensor improvements for real Fuelio exports
+- `0.1.0`: initial custom integration MVP
 
 ## Tests
 
