@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+hjundaj-1-2026-04-19_12-09.csv

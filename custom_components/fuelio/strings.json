@@ -1,0 +1,92 @@
+{
+  "title": "Fuelio",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Fuelio CSV import",
+        "description": "Import Fuelio backup CSV data from a local CSV file or folder.",
+        "data": {
+          "source_path": "CSV file or folder path",
+          "scan_interval": "Scan interval (minutes)"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Fuelio",
+        "data": {
+          "source_path": "CSV file or folder path",
+          "scan_interval": "Scan interval (minutes)"
+        }
+      }
+    },
+    "error": {
+      "invalid_folder": "The selected path must be an existing CSV file or directory."
+    },
+    "abort": {
+      "already_configured": "This path is already configured.",
+      "reconfigured": "Configuration updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Fuelio options",
+        "data": {
+          "source_path": "CSV file or folder path",
+          "scan_interval": "Scan interval (minutes)"
+        }
+      }
+    },
+    "error": {
+      "invalid_folder": "The selected path must be an existing CSV file or directory."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "last_fill_date": {
+        "name": "Last fill date"
+      },
+      "days_since_fill": {
+        "name": "Days since fill"
+      },
+      "last_fill_volume": {
+        "name": "Last fill volume"
+      },
+      "last_fill_cost": {
+        "name": "Last fill cost"
+      },
+      "last_price_per_unit": {
+        "name": "Last price per unit"
+      },
+      "last_consumption": {
+        "name": "Last consumption"
+      },
+      "odometer": {
+        "name": "Odometer"
+      },
+      "distance_since_previous_fill": {
+        "name": "Distance since previous fill"
+      },
+      "tracked_distance": {
+        "name": "Tracked distance"
+      },
+      "fill_count": {
+        "name": "Fill count"
+      },
+      "cost_30d": {
+        "name": "Fuel cost 30 days"
+      },
+      "total_cost": {
+        "name": "Total cost"
+      },
+      "total_volume": {
+        "name": "Total volume"
+      },
+      "average_price": {
+        "name": "Average price"
+      },
+      "average_consumption": {
+        "name": "Average consumption"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+"""Constants for the Fuelio integration."""
+
+from __future__ import annotations
+
+DOMAIN = "fuelio"
+
+CONF_SOURCE_PATH = "source_path"
+CONF_SCAN_INTERVAL = "scan_interval"
+
+DEFAULT_SCAN_INTERVAL = 60
+PLATFORMS = ["sensor"]
