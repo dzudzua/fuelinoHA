@@ -395,6 +395,17 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         weather_temp = _last_fill_temperature(self.vehicle)
         if weather_temp is not None:
             attrs["last_fill_temperature"] = weather_temp
+        attrs["data_span_days"] = _data_span_days(self.vehicle)
+        attrs["partial_fill_count"] = _partial_fill_count(self.vehicle)
+        attrs["full_tank_count"] = _full_tank_count(self.vehicle)
+        best_consumption = _extreme_record_value(self.vehicle, "consumption", min)
+        if best_consumption is not None:
+            attrs["best_consumption"] = best_consumption
+        worst_consumption = _extreme_record_value(self.vehicle, "consumption", max)
+        if worst_consumption is not None:
+            attrs["worst_consumption"] = worst_consumption
+        attrs["recent_fills"] = _recent_fills(self.vehicle, limit=5)
+        attrs["monthly_summary"] = _monthly_summary(self.vehicle, limit=6)
         return attrs
 
 
@@ -565,6 +576,23 @@ def _favorite_station(vehicle: ParsedVehicle) -> str | None:
     return Counter(values).most_common(1)[0][0]
 
 
+def _data_span_days(vehicle: ParsedVehicle) -> int:
+    """Return how many days of history the imported CSV covers."""
+    if len(vehicle.records) < 2:
+        return 0
+    return (vehicle.records[-1].occurred_on - vehicle.records[0].occurred_on).days
+
+
+def _partial_fill_count(vehicle: ParsedVehicle) -> int:
+    """Return how many partial fills exist in the imported data."""
+    return sum(1 for record in vehicle.records if record.is_partial is True)
+
+
+def _full_tank_count(vehicle: ParsedVehicle) -> int:
+    """Return how many full-tank fills exist in the imported data."""
+    return sum(1 for record in vehicle.records if record.is_partial is False)
+
+
 def _last_fill_temperature(vehicle: ParsedVehicle) -> float | None:
     """Return temperature from the latest weather payload."""
     temp_value = vehicle.records[-1].weather.get("temp")
@@ -586,3 +614,101 @@ def _extreme_record_value(vehicle: ParsedVehicle, field: str, reducer) -> float 
     if not values:
         return None
     return round(reducer(values), 3)
+
+
+def _recent_fills(vehicle: ParsedVehicle, limit: int = 5) -> list[dict[str, Any]]:
+    """Return a compact summary of the most recent fills."""
+    recent = list(reversed(vehicle.records[-limit:]))
+    rows: list[dict[str, Any]] = []
+    for record in recent:
+        rows.append(
+            {
+                "date": record.occurred_on.isoformat(),
+                "odometer": record.odometer,
+                "volume": record.volume,
+                "cost": record.cost,
+                "price_per_unit": record.price_per_unit,
+                "consumption": record.consumption,
+                "city": record.city,
+                "station_id": record.station_id,
+                "fuel_type": record.fuel_type,
+                "is_partial": record.is_partial,
+                "temperature": _safe_float(record.weather.get("temp")),
+                "weather_description": record.weather.get("desc"),
+            }
+        )
+    return rows
+
+
+def _monthly_summary(vehicle: ParsedVehicle, limit: int = 6) -> list[dict[str, Any]]:
+    """Return monthly rollups from parsed fill records."""
+    monthly: dict[tuple[int, int], dict[str, Any]] = {}
+    for record in vehicle.records:
+        key = (record.occurred_on.year, record.occurred_on.month)
+        summary = monthly.setdefault(
+            key,
+            {
+                "year": record.occurred_on.year,
+                "month": record.occurred_on.month,
+                "fill_count": 0,
+                "total_cost": 0.0,
+                "total_volume": 0.0,
+                "price_sum": 0.0,
+                "price_count": 0,
+                "odometer_min": record.odometer,
+                "odometer_max": record.odometer,
+            },
+        )
+        summary["fill_count"] += 1
+        if record.cost is not None:
+            summary["total_cost"] += record.cost
+        if record.volume is not None:
+            summary["total_volume"] += record.volume
+        if record.price_per_unit is not None:
+            summary["price_sum"] += record.price_per_unit
+            summary["price_count"] += 1
+        if record.odometer is not None:
+            current_min = summary["odometer_min"]
+            current_max = summary["odometer_max"]
+            summary["odometer_min"] = (
+                record.odometer
+                if current_min is None
+                else min(current_min, record.odometer)
+            )
+            summary["odometer_max"] = (
+                record.odometer
+                if current_max is None
+                else max(current_max, record.odometer)
+            )
+
+    result: list[dict[str, Any]] = []
+    for key in sorted(monthly.keys(), reverse=True)[:limit]:
+        summary = monthly[key]
+        distance = None
+        if summary["odometer_min"] is not None and summary["odometer_max"] is not None:
+            distance = round(summary["odometer_max"] - summary["odometer_min"], 3)
+        average_price = None
+        if summary["price_count"]:
+            average_price = round(summary["price_sum"] / summary["price_count"], 3)
+        result.append(
+            {
+                "year": summary["year"],
+                "month": summary["month"],
+                "fill_count": summary["fill_count"],
+                "total_cost": round(summary["total_cost"], 2),
+                "total_volume": round(summary["total_volume"], 2),
+                "distance": distance,
+                "average_price": average_price,
+            }
+        )
+    return result
+
+
+def _safe_float(value: Any) -> float | None:
+    """Convert an optional numeric-like value to float."""
+    if value in (None, ""):
+        return None
+    try:
+        return round(float(value), 2)
+    except (TypeError, ValueError):
+        return None

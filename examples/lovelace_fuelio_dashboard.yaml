@@ -81,3 +81,27 @@ sections:
       - type: tile
         entity: sensor.hyundai_i30_tracked_distance
         name: Tracked distance
+  - type: grid
+    cards:
+      - type: heading
+        heading: History
+      - type: markdown
+        title: Recent fills
+        content: >
+          {% set fills = state_attr('sensor.hyundai_i30_last_fill_date', 'recent_fills') or [] %}
+          {% for fill in fills %}
+          - **{{ fill.date }}** | {{ fill.volume }} L | {{ fill.cost }} |
+          {{ fill.city or fill.station_id or 'Unknown station' }} |
+          {{ 'partial' if fill.is_partial else 'full' }}{% if fill.temperature is not none %}
+          | {{ fill.temperature }} °C{% endif %}{% if fill.weather_description %}
+          | {{ fill.weather_description }}{% endif %}
+          {% endfor %}
+      - type: markdown
+        title: Monthly summary
+        content: >
+          {% set months = state_attr('sensor.hyundai_i30_last_fill_date', 'monthly_summary') or [] %}
+          {% for month in months %}
+          - **{{ month.year }}-{{ '%02d'|format(month.month) }}** | fills: {{ month.fill_count }} |
+          cost: {{ month.total_cost }} | volume: {{ month.total_volume }} |
+          distance: {{ month.distance }} | avg price: {{ month.average_price }}
+          {% endfor %}
