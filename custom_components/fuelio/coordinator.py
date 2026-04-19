@@ -58,7 +58,7 @@ class FuelioDataUpdateCoordinator(DataUpdateCoordinator[FuelioData]):
         """Read and parse the configured CSV files."""
         source_path = self.source_path
         if not source_path.exists():
-            raise OSError(f"Source path does not exist: {source_path}")
+            return FuelioData(vehicles={}, source_files=[])
 
         if source_path.is_file():
             csv_files = [source_path] if source_path.suffix.lower() == ".csv" else []

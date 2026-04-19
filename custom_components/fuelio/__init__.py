@@ -43,11 +43,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Fuelio from a config entry."""
     coordinator = FuelioDataUpdateCoordinator(hass, entry)
-
-    try:
-        await coordinator.async_config_entry_first_refresh()
-    except OSError as err:
-        raise ConfigEntryNotReady(f"Cannot read Fuelio source path: {err}") from err
+    await coordinator.async_config_entry_first_refresh()
 
     entry.runtime_data = coordinator
     hass.data[DOMAIN][entry.entry_id] = coordinator
