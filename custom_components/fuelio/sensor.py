@@ -198,13 +198,15 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
     @property
     def device_info(self) -> dict[str, Any]:
         """Return device info for the vehicle."""
-        return {
+        device_info: dict[str, Any] = {
             "identifiers": {(DOMAIN, self._vehicle_key)},
             "name": self.vehicle.name,
             "manufacturer": "Fuelio",
             "model": self.vehicle.model or "CSV Import",
-            "model_year": self.vehicle.year,
         }
+        if self.vehicle.year is not None:
+            device_info["sw_version"] = str(self.vehicle.year)
+        return device_info
 
     @property
     def name(self) -> str | None:
