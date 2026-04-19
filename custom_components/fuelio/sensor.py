@@ -37,6 +37,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         key="last_fill_date",
         translation_key="last_fill_date",
         device_class=SensorDeviceClass.DATE,
+        icon="mdi:calendar-check",
         value_fn=lambda vehicle: vehicle.records[-1].occurred_on,
     ),
     FuelioSensorDescription(
@@ -44,6 +45,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="days_since_fill",
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement="d",
+        icon="mdi:calendar-clock",
         value_fn=lambda vehicle: (date.today() - vehicle.records[-1].occurred_on).days,
     ),
     FuelioSensorDescription(
@@ -52,6 +54,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement="L",
         suggested_display_precision=2,
+        icon="mdi:gas-station",
         value_fn=lambda vehicle: vehicle.records[-1].volume,
     ),
     FuelioSensorDescription(
@@ -59,6 +62,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="last_fill_cost",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
+        icon="mdi:cash",
         value_fn=lambda vehicle: vehicle.records[-1].cost,
     ),
     FuelioSensorDescription(
@@ -66,6 +70,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="last_price_per_unit",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=3,
+        icon="mdi:currency-usd",
         value_fn=lambda vehicle: vehicle.records[-1].price_per_unit,
     ),
     FuelioSensorDescription(
@@ -73,6 +78,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="last_consumption",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
+        icon="mdi:chart-bell-curve-cumulative",
         value_fn=lambda vehicle: vehicle.records[-1].consumption,
     ),
     FuelioSensorDescription(
@@ -81,17 +87,20 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement="°C",
+        icon="mdi:thermometer",
         suggested_display_precision=1,
         value_fn=lambda vehicle: _last_fill_temperature(vehicle),
     ),
     FuelioSensorDescription(
         key="last_city",
         translation_key="last_city",
+        icon="mdi:map-marker",
         value_fn=lambda vehicle: vehicle.records[-1].city,
     ),
     FuelioSensorDescription(
         key="favorite_station",
         translation_key="favorite_station",
+        icon="mdi:star-circle",
         value_fn=lambda vehicle: _favorite_station(vehicle),
     ),
     FuelioSensorDescription(
@@ -101,6 +110,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         state_class=SensorStateClass.TOTAL,
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=1,
+        icon="mdi:counter",
         value_fn=lambda vehicle: vehicle.records[-1].odometer,
     ),
     FuelioSensorDescription(
@@ -109,6 +119,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=1,
+        icon="mdi:map-marker-distance",
         value_fn=lambda vehicle: _distance_since_previous_fill(vehicle),
     ),
     FuelioSensorDescription(
@@ -118,12 +129,14 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=1,
+        icon="mdi:road-variant",
         value_fn=lambda vehicle: _tracked_distance(vehicle),
     ),
     FuelioSensorDescription(
         key="fill_count",
         translation_key="fill_count",
         state_class=SensorStateClass.TOTAL,
+        icon="mdi:counter",
         value_fn=lambda vehicle: len(vehicle.records),
     ),
     FuelioSensorDescription(
@@ -131,6 +144,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="cost_30d",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
+        icon="mdi:calendar-month",
         value_fn=lambda vehicle: _sum_cost_since_days(vehicle, 30),
     ),
     FuelioSensorDescription(
@@ -138,12 +152,14 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="fuel_cost_this_month",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
+        icon="mdi:cash-multiple",
         value_fn=lambda vehicle: _sum_cost_current_month(vehicle),
     ),
     FuelioSensorDescription(
         key="fill_count_30d",
         translation_key="fill_count_30d",
         state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:format-list-numbered",
         value_fn=lambda vehicle: _fill_count_since_days(vehicle, 30),
     ),
     FuelioSensorDescription(
@@ -151,6 +167,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="total_cost",
         state_class=SensorStateClass.TOTAL_INCREASING,
         suggested_display_precision=2,
+        icon="mdi:cash-check",
         value_fn=lambda vehicle: _sum_record_values(vehicle, "cost"),
     ),
     FuelioSensorDescription(
@@ -159,6 +176,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement="L",
         suggested_display_precision=2,
+        icon="mdi:gas-station-outline",
         value_fn=lambda vehicle: _sum_record_values(vehicle, "volume"),
     ),
     FuelioSensorDescription(
@@ -166,6 +184,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="average_price",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=3,
+        icon="mdi:finance",
         value_fn=lambda vehicle: _average_price(vehicle),
     ),
     FuelioSensorDescription(
@@ -173,6 +192,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="average_consumption",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
+        icon="mdi:chart-line",
         value_fn=lambda vehicle: _average_record_values(vehicle, "consumption"),
     ),
     FuelioSensorDescription(
@@ -180,6 +200,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="average_consumption_30d",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
+        icon="mdi:chart-timeline-variant",
         value_fn=lambda vehicle: _average_record_values_since_days(
             vehicle, "consumption", 30
         ),
@@ -189,6 +210,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="average_cost_per_km",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=3,
+        icon="mdi:currency-sign",
         value_fn=lambda vehicle: _average_cost_per_km(vehicle),
     ),
     FuelioSensorDescription(
@@ -197,6 +219,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=1,
+        icon="mdi:calendar-range",
         value_fn=lambda vehicle: _distance_current_month(vehicle),
     ),
     FuelioSensorDescription(
@@ -204,6 +227,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="days_since_full_tank",
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement="d",
+        icon="mdi:calendar-refresh",
         value_fn=lambda vehicle: _days_since_full_tank(vehicle),
     ),
     FuelioSensorDescription(
@@ -212,6 +236,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=1,
+        icon="mdi:highway",
         value_fn=lambda vehicle: _km_since_full_tank(vehicle),
     ),
     FuelioSensorDescription(
@@ -219,6 +244,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="lowest_price_per_unit",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=3,
+        icon="mdi:arrow-down-bold-circle",
         value_fn=lambda vehicle: _extreme_record_value(vehicle, "price_per_unit", min),
     ),
     FuelioSensorDescription(
@@ -226,6 +252,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="highest_price_per_unit",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=3,
+        icon="mdi:arrow-up-bold-circle",
         value_fn=lambda vehicle: _extreme_record_value(vehicle, "price_per_unit", max),
     ),
 )
