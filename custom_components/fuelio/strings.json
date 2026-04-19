@@ -39,6 +39,14 @@
     "error": {}
   },
   "entity": {
+    "button": {
+      "open_upload_page": {
+        "name": "Open upload help"
+      },
+      "reload_data": {
+        "name": "Reload data"
+      }
+    },
     "sensor": {
       "last_fill_date": {
         "name": "Last fill date"

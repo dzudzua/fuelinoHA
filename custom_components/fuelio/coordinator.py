@@ -68,11 +68,16 @@ class FuelioDataUpdateCoordinator(DataUpdateCoordinator[FuelioData]):
                 csv_files = sorted(source_path.glob("*.csv"))
 
         vehicles: dict[str, ParsedVehicle] = {}
+        latest_mtimes: dict[str, float] = {}
         for csv_file in csv_files:
             parsed = await self.hass.async_add_executor_job(parse_vehicle_file, csv_file)
             if parsed is None:
                 continue
-            vehicles[parsed.key] = parsed
+            file_mtime = csv_file.stat().st_mtime
+            previous_mtime = latest_mtimes.get(parsed.key)
+            if previous_mtime is None or file_mtime >= previous_mtime:
+                latest_mtimes[parsed.key] = file_mtime
+                vehicles[parsed.key] = parsed
 
         return FuelioData(
             vehicles=vehicles,
