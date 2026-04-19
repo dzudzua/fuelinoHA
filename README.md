@@ -4,7 +4,7 @@ Custom Home Assistant integration for importing Fuelio backup CSV files.
 
 ## Version
 
-Current integration version: `0.1.8`
+Current integration version: `0.1.9`
 
 ## Installation
 
@@ -84,6 +84,7 @@ Do not commit your real Fuelio exports to a public repository. Keep personal CSV
 
 ## Changelog
 
+- `0.1.9`: fixed Home Assistant sidebar panel registration for CSV upload
 - `0.1.8`: added direct CSV upload panel inside Home Assistant
 - `0.1.7`: fixed Home Assistant device registration compatibility
 - `0.1.6`: minimized package init imports to troubleshoot config flow loading

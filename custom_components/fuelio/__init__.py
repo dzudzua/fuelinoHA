@@ -6,7 +6,7 @@ from pathlib import Path
 
 from aiohttp import web
 
-from homeassistant.components import panel_custom
+from homeassistant.components.frontend import async_register_built_in_panel
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -21,7 +21,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     hass.data.setdefault(DOMAIN, {})
     hass.http.register_view(FuelioUploadPanelJsView(hass))
     hass.http.register_view(FuelioUploadView(hass))
-    panel_custom.async_register_panel(
+    async_register_built_in_panel(
         hass,
         webcomponent_name="fuelio-upload-panel",
         frontend_url_path=PANEL_URL_PATH,
