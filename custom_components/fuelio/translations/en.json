@@ -66,6 +66,9 @@
       "last_consumption": {
         "name": "Last consumption"
       },
+      "last_fill_temperature": {
+        "name": "Last fill temperature"
+      },
       "odometer": {
         "name": "Odometer"
       },
@@ -81,6 +84,9 @@
       "cost_30d": {
         "name": "Fuel cost 30 days"
       },
+      "fuel_cost_this_month": {
+        "name": "Fuel cost this month"
+      },
       "total_cost": {
         "name": "Total cost"
       },
@@ -92,6 +98,15 @@
       },
       "average_consumption": {
         "name": "Average consumption"
+      },
+      "average_cost_per_km": {
+        "name": "Average cost per distance"
+      },
+      "days_since_full_tank": {
+        "name": "Days since full tank"
+      },
+      "km_since_full_tank": {
+        "name": "Distance since full tank"
       }
     }
   }

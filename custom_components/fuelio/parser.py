@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from csv import DictReader, Sniffer, reader as csv_reader
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 import re
@@ -20,6 +20,10 @@ class FillRecord:
     price_per_unit: float | None
     consumption: float | None
     is_partial: bool | None
+    city: str | None
+    station_id: str | None
+    fuel_type: str | None
+    weather: dict[str, str] = field(default_factory=dict)
     raw: dict[str, str]
 
 
@@ -54,6 +58,9 @@ HEADER_ALIASES = {
         "unit price",
     ),
     "consumption": ("l/100km", "consumption", "avg consumption", "kwh/100km"),
+    "city": ("city", "location", "place"),
+    "station_id": ("stationid", "station id", "station"),
+    "fuel_type": ("fueltype", "fuel type"),
     "partial": ("partial", "missed", "full tank", "tank full"),
     "vehicle": ("vehicle", "car", "name"),
     "currency": ("currency",),
@@ -137,6 +144,12 @@ def _parse_sectioned_fuelio_file(path: Path, text: str) -> ParsedVehicle | None:
                 log_entry.get("Full"),
                 log_entry.get("Missed"),
             ),
+            city=_clean_text(log_entry.get("City (optional)") or log_entry.get("City")),
+            station_id=_clean_text(
+                log_entry.get("StationID (optional)") or log_entry.get("StationID")
+            ),
+            fuel_type=_clean_text(log_entry.get("FuelType")),
+            weather=_parse_weather(log_entry.get("Weather")),
             raw=log_entry,
         )
         if record.volume is None and record.cost is None and record.odometer is None:
@@ -217,6 +230,10 @@ def _parse_generic_csv_file(path: Path, text: str) -> ParsedVehicle | None:
             is_partial=_parse_bool(
                 _first_non_empty(normalized_row, header_map.get("partial"))
             ),
+            city=_first_non_empty(normalized_row, header_map.get("city")),
+            station_id=_first_non_empty(normalized_row, header_map.get("station_id")),
+            fuel_type=_first_non_empty(normalized_row, header_map.get("fuel_type")),
+            weather={},
             raw=normalized_row,
         )
         if record.volume is None and record.cost is None and record.odometer is None:
@@ -389,3 +406,20 @@ def _build_vehicle_name(base_name: str, make: str | None, model: str | None) -> 
         if combined:
             return combined
     return _clean_text(base_name) or _slug_to_title(base_name)
+
+
+def _parse_weather(value: str | None) -> dict[str, str]:
+    """Parse Fuelio's pipe-separated weather payload."""
+    if not value:
+        return {}
+
+    parsed: dict[str, str] = {}
+    for part in value.split("|"):
+        if ":" not in part:
+            continue
+        key, raw_value = part.split(":", 1)
+        key = key.strip()
+        raw_value = raw_value.strip()
+        if key:
+            parsed[key] = raw_value
+    return parsed

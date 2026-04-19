@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
@@ -75,6 +76,15 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         value_fn=lambda vehicle: vehicle.records[-1].consumption,
     ),
     FuelioSensorDescription(
+        key="last_fill_temperature",
+        translation_key="last_fill_temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="°C",
+        suggested_display_precision=1,
+        value_fn=lambda vehicle: _last_fill_temperature(vehicle),
+    ),
+    FuelioSensorDescription(
         key="odometer",
         translation_key="odometer",
         device_class=SensorDeviceClass.DISTANCE,
@@ -114,6 +124,13 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         value_fn=lambda vehicle: _sum_cost_since_days(vehicle, 30),
     ),
     FuelioSensorDescription(
+        key="fuel_cost_this_month",
+        translation_key="fuel_cost_this_month",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        value_fn=lambda vehicle: _sum_cost_current_month(vehicle),
+    ),
+    FuelioSensorDescription(
         key="total_cost",
         translation_key="total_cost",
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -141,6 +158,28 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
         value_fn=lambda vehicle: _average_record_values(vehicle, "consumption"),
+    ),
+    FuelioSensorDescription(
+        key="average_cost_per_km",
+        translation_key="average_cost_per_km",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=3,
+        value_fn=lambda vehicle: _average_cost_per_km(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="days_since_full_tank",
+        translation_key="days_since_full_tank",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="d",
+        value_fn=lambda vehicle: _days_since_full_tank(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="km_since_full_tank",
+        translation_key="km_since_full_tank",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        suggested_display_precision=1,
+        value_fn=lambda vehicle: _km_since_full_tank(vehicle),
     ),
 )
 
@@ -226,20 +265,28 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
     @property
     def suggested_unit_of_measurement(self) -> str | None:
         """Return per-vehicle currency when relevant."""
-        if self.entity_description.key in {"last_fill_cost", "total_cost"}:
-            return self.vehicle.currency
-        if self.entity_description.key == "cost_30d":
+        if self.entity_description.key in {
+            "last_fill_cost",
+            "total_cost",
+            "cost_30d",
+            "fuel_cost_this_month",
+        }:
             return self.vehicle.currency
         if self.entity_description.key in {"last_price_per_unit", "average_price"}:
             if self.vehicle.currency:
                 unit = self.vehicle.fuel_unit or "L"
                 return f"{self.vehicle.currency}/{unit}"
+        if self.entity_description.key == "average_cost_per_km":
+            if self.vehicle.currency:
+                distance_unit = self.vehicle.distance_unit or "km"
+                return f"{self.vehicle.currency}/{distance_unit}"
         if self.entity_description.key in {"last_fill_volume", "total_volume"}:
             return self.vehicle.fuel_unit or "L"
         if self.entity_description.key in {
             "odometer",
             "distance_since_previous_fill",
             "tracked_distance",
+            "km_since_full_tank",
         }:
             if self.vehicle.distance_unit == "mi":
                 return UnitOfLength.MILES
@@ -276,6 +323,19 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             attrs["latest_cost"] = latest.cost
         if latest.consumption is not None:
             attrs["latest_consumption"] = latest.consumption
+        if latest.city is not None:
+            attrs["last_city"] = latest.city
+        favorite_station = _favorite_station(self.vehicle)
+        if favorite_station is not None:
+            attrs["favorite_station"] = favorite_station
+        if latest.fuel_type is not None:
+            attrs["last_fuel_type"] = latest.fuel_type
+        weather_desc = latest.weather.get("desc")
+        if weather_desc:
+            attrs["last_weather_description"] = weather_desc
+        weather_temp = _last_fill_temperature(self.vehicle)
+        if weather_temp is not None:
+            attrs["last_fill_temperature"] = weather_temp
         return attrs
 
 
@@ -347,3 +407,75 @@ def _sum_cost_since_days(vehicle: ParsedVehicle, days: int) -> float | None:
     if not values:
         return None
     return round(sum(values), 3)
+
+
+def _sum_cost_current_month(vehicle: ParsedVehicle) -> float | None:
+    """Return the sum of costs in the current calendar month."""
+    today = date.today()
+    values = [
+        record.cost
+        for record in vehicle.records
+        if record.cost is not None
+        and record.occurred_on.year == today.year
+        and record.occurred_on.month == today.month
+    ]
+    if not values:
+        return None
+    return round(sum(values), 3)
+
+
+def _average_cost_per_km(vehicle: ParsedVehicle) -> float | None:
+    """Return average cost per tracked distance unit."""
+    total_cost = _sum_record_values(vehicle, "cost")
+    tracked_distance = _tracked_distance(vehicle)
+    if not total_cost or not tracked_distance:
+        return None
+    return round(total_cost / tracked_distance, 4)
+
+
+def _find_last_full_record(vehicle: ParsedVehicle):
+    """Return the last full-tank record if available."""
+    for record in reversed(vehicle.records):
+        if record.is_partial is False:
+            return record
+    return None
+
+
+def _days_since_full_tank(vehicle: ParsedVehicle) -> int | None:
+    """Return days since the last full tank."""
+    last_full = _find_last_full_record(vehicle)
+    if last_full is None:
+        return None
+    return (date.today() - last_full.occurred_on).days
+
+
+def _km_since_full_tank(vehicle: ParsedVehicle) -> float | None:
+    """Return distance since the last full tank."""
+    last_full = _find_last_full_record(vehicle)
+    latest = vehicle.records[-1]
+    if last_full is None or latest.odometer is None or last_full.odometer is None:
+        return None
+    return round(latest.odometer - last_full.odometer, 3)
+
+
+def _favorite_station(vehicle: ParsedVehicle) -> str | None:
+    """Return the most frequent city/station label."""
+    values = [
+        record.city or record.station_id
+        for record in vehicle.records
+        if record.city or record.station_id
+    ]
+    if not values:
+        return None
+    return Counter(values).most_common(1)[0][0]
+
+
+def _last_fill_temperature(vehicle: ParsedVehicle) -> float | None:
+    """Return temperature from the latest weather payload."""
+    temp_value = vehicle.records[-1].weather.get("temp")
+    if not temp_value:
+        return None
+    try:
+        return round(float(temp_value), 2)
+    except ValueError:
+        return None
