@@ -86,7 +86,8 @@ class FuelioUploadView(HomeAssistantView):
         )
 
         for coordinator in self.hass.data.get(DOMAIN, {}).values():
-            await coordinator.async_request_refresh()
+            if hasattr(coordinator, "async_request_refresh"):
+                await coordinator.async_request_refresh()
 
         return web.json_response(
             {
