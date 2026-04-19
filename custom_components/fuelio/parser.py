@@ -23,8 +23,8 @@ class FillRecord:
     city: str | None
     station_id: str | None
     fuel_type: str | None
-    weather: dict[str, str] = field(default_factory=dict)
     raw: dict[str, str]
+    weather: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
