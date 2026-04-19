@@ -4,7 +4,7 @@ Custom Home Assistant integration for importing Fuelio backup CSV files.
 
 ## Version
 
-Current integration version: `0.1.14`
+Current integration version: `0.1.15`
 
 ## Installation
 
@@ -61,7 +61,8 @@ If you install via HACS instead of manual copy, only steps 2-4 are needed after 
 
 The integration now includes a built-in upload page inside Home Assistant.
 
-- Open `/fuelio-upload` in your Home Assistant browser session
+- Open `/api/fuelio/upload-page` in your Home Assistant browser session
+- Alias URL `/fuelio-upload` should also work
 - Pick a CSV file from your phone or computer
 - The file is stored into the Home Assistant config folder under `fuelino/`
 - Loaded Fuelio entries are refreshed automatically after upload
@@ -84,6 +85,7 @@ Do not commit your real Fuelio exports to a public repository. Keep personal CSV
 
 ## Changelog
 
+- `0.1.15`: moved upload page to explicit API route for better compatibility with HA routing and Nabu Casa
 - `0.1.14`: fixed unauthorized access to the upload page while keeping uploads protected
 - `0.1.13`: switched upload UI to a stable internal authenticated page at `/fuelio-upload`
 - `0.1.12`: switched upload UI back to authenticated custom panel

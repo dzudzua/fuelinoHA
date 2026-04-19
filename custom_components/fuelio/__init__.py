@@ -84,7 +84,8 @@ class FuelioUploadView(HomeAssistantView):
 class FuelioUploadPageView(HomeAssistantView):
     """Serve a simple authenticated upload page."""
 
-    url = f"/{PANEL_URL_PATH}"
+    url = "/api/fuelio/upload-page"
+    extra_urls = [f"/{PANEL_URL_PATH}"]
     name = "fuelio:upload_page"
     requires_auth = False
 
