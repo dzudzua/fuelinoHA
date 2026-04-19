@@ -4,7 +4,7 @@ Custom Home Assistant integration for importing Fuelio backup CSV files.
 
 ## Version
 
-Current integration version: `0.3.1`
+Current integration version: `0.4.0`
 
 ## Installation
 
@@ -76,6 +76,14 @@ Fuelio now also exposes helper buttons directly inside Home Assistant:
 
 When the configured source path is a folder, Fuelio now prefers the newest CSV per vehicle.
 
+## Dashboard Example
+
+A ready-to-adapt Lovelace example is available in:
+
+- `examples/lovelace_fuelio_dashboard.yaml`
+
+Rename entity ids there to match your own vehicle slug if needed.
+
 ## GitHub publishing
 
 Minimal flow:
@@ -94,6 +102,7 @@ Do not commit your real Fuelio exports to a public repository. Keep personal CSV
 
 ## Changelog
 
+- `0.4.0`: added richer city, station, 30-day and dashboard-focused insights
 - `0.3.1`: fixed parser dataclass field ordering for Home Assistant startup
 - `0.3.0`: added richer CSV insights like monthly cost, full-tank metrics, city and weather-based details
 - `0.2.1`: relative source paths now resolve inside the Home Assistant config directory

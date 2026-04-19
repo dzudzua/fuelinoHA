@@ -1,0 +1,83 @@
+type: sections
+max_columns: 3
+title: Fuelio
+path: fuelio
+sections:
+  - type: grid
+    cards:
+      - type: heading
+        heading: Hyundai i30
+      - type: tile
+        entity: sensor.hyundai_i30_last_fill_date
+        name: Last fill
+      - type: tile
+        entity: sensor.hyundai_i30_last_fill_cost
+        name: Last cost
+      - type: tile
+        entity: sensor.hyundai_i30_last_price_per_unit
+        name: Price / unit
+      - type: tile
+        entity: sensor.hyundai_i30_odometer
+        name: Odometer
+      - type: tile
+        entity: sensor.hyundai_i30_last_consumption
+        name: Last consumption
+      - type: tile
+        entity: sensor.hyundai_i30_last_city
+        name: Last city
+      - type: tile
+        entity: sensor.hyundai_i30_favorite_station
+        name: Favorite station
+      - type: tile
+        entity: sensor.hyundai_i30_days_since_full_tank
+        name: Days since full tank
+      - type: tile
+        entity: sensor.hyundai_i30_km_since_full_tank
+        name: Km since full tank
+  - type: grid
+    cards:
+      - type: heading
+        heading: Cost & Trends
+      - type: statistic
+        entity: sensor.hyundai_i30_fuel_cost_this_month
+        name: Fuel cost this month
+      - type: statistic
+        entity: sensor.hyundai_i30_cost_30d
+        name: Fuel cost 30 days
+      - type: statistic
+        entity: sensor.hyundai_i30_average_cost_per_km
+        name: Average cost / km
+      - type: statistic
+        entity: sensor.hyundai_i30_average_consumption
+        name: Average consumption
+      - type: statistic
+        entity: sensor.hyundai_i30_average_consumption_30d
+        name: Avg consumption 30d
+      - type: statistic
+        entity: sensor.hyundai_i30_distance_this_month
+        name: Distance this month
+      - type: statistic
+        entity: sensor.hyundai_i30_fill_count_30d
+        name: Fill count 30d
+  - type: grid
+    cards:
+      - type: heading
+        heading: Records
+      - type: tile
+        entity: sensor.hyundai_i30_lowest_price_per_unit
+        name: Lowest price
+      - type: tile
+        entity: sensor.hyundai_i30_highest_price_per_unit
+        name: Highest price
+      - type: tile
+        entity: sensor.hyundai_i30_last_fill_temperature
+        name: Last fill temp
+      - type: tile
+        entity: sensor.hyundai_i30_total_cost
+        name: Total cost
+      - type: tile
+        entity: sensor.hyundai_i30_total_volume
+        name: Total volume
+      - type: tile
+        entity: sensor.hyundai_i30_tracked_distance
+        name: Tracked distance

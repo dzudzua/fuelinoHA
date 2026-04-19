@@ -69,6 +69,12 @@
       "last_fill_temperature": {
         "name": "Last fill temperature"
       },
+      "last_city": {
+        "name": "Last city"
+      },
+      "favorite_station": {
+        "name": "Favorite station"
+      },
       "odometer": {
         "name": "Odometer"
       },
@@ -87,6 +93,9 @@
       "fuel_cost_this_month": {
         "name": "Fuel cost this month"
       },
+      "fill_count_30d": {
+        "name": "Fill count 30 days"
+      },
       "total_cost": {
         "name": "Total cost"
       },
@@ -99,14 +108,26 @@
       "average_consumption": {
         "name": "Average consumption"
       },
+      "average_consumption_30d": {
+        "name": "Average consumption 30 days"
+      },
       "average_cost_per_km": {
         "name": "Average cost per distance"
+      },
+      "distance_this_month": {
+        "name": "Distance this month"
       },
       "days_since_full_tank": {
         "name": "Days since full tank"
       },
       "km_since_full_tank": {
         "name": "Distance since full tank"
+      },
+      "lowest_price_per_unit": {
+        "name": "Lowest price per unit"
+      },
+      "highest_price_per_unit": {
+        "name": "Highest price per unit"
       }
     }
   }
