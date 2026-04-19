@@ -23,7 +23,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     hass.http.register_view(FuelioUploadView(hass))
     async_register_built_in_panel(
         hass,
-        webcomponent_name="fuelio-upload-panel",
+        component_name="custom",
         frontend_url_path=PANEL_URL_PATH,
         module_url=PANEL_MODULE_URL,
         sidebar_title="Fuelio Upload",
