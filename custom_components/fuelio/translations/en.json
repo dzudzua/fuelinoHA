@@ -75,6 +75,12 @@
       "favorite_station": {
         "name": "Favorite station"
       },
+      "favorite_city": {
+        "name": "Favorite city"
+      },
+      "favorite_station_id": {
+        "name": "Favorite station ID"
+      },
       "odometer": {
         "name": "Odometer"
       },
@@ -105,8 +111,17 @@
       "average_price": {
         "name": "Average price"
       },
+      "average_price_5_fills": {
+        "name": "Average price last 5 fills"
+      },
       "average_consumption": {
         "name": "Average consumption"
+      },
+      "best_consumption": {
+        "name": "Best consumption"
+      },
+      "worst_consumption": {
+        "name": "Worst consumption"
       },
       "average_consumption_30d": {
         "name": "Average consumption 30 days"
@@ -114,8 +129,35 @@
       "average_cost_per_km": {
         "name": "Average cost per distance"
       },
+      "average_fill_volume": {
+        "name": "Average fill volume"
+      },
+      "average_days_between_fills": {
+        "name": "Average days between fills"
+      },
+      "average_distance_between_fills": {
+        "name": "Average distance between fills"
+      },
       "distance_this_month": {
         "name": "Distance this month"
+      },
+      "last_month_cost": {
+        "name": "Last month cost"
+      },
+      "last_month_average_consumption": {
+        "name": "Last month average consumption"
+      },
+      "last_month_fill_count": {
+        "name": "Last month fill count"
+      },
+      "last_month_average_price": {
+        "name": "Last month average price"
+      },
+      "month_over_month_cost_delta": {
+        "name": "Month over month cost delta"
+      },
+      "fuel_price_trend": {
+        "name": "Fuel price trend"
       },
       "days_since_full_tank": {
         "name": "Days since full tank"
@@ -128,6 +170,18 @@
       },
       "highest_price_per_unit": {
         "name": "Highest price per unit"
+      },
+      "most_expensive_fill": {
+        "name": "Most expensive fill"
+      },
+      "least_expensive_fill": {
+        "name": "Least expensive fill"
+      },
+      "different_stations_count": {
+        "name": "Different stations count"
+      },
+      "different_cities_count": {
+        "name": "Different cities count"
       }
     }
   }

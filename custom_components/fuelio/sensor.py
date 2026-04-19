@@ -104,6 +104,18 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         value_fn=lambda vehicle: _favorite_station(vehicle),
     ),
     FuelioSensorDescription(
+        key="favorite_city",
+        translation_key="favorite_city",
+        icon="mdi:city",
+        value_fn=lambda vehicle: _favorite_city(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="favorite_station_id",
+        translation_key="favorite_station_id",
+        icon="mdi:pump",
+        value_fn=lambda vehicle: _favorite_station_id(vehicle),
+    ),
+    FuelioSensorDescription(
         key="odometer",
         translation_key="odometer",
         device_class=SensorDeviceClass.DISTANCE,
@@ -171,6 +183,22 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         value_fn=lambda vehicle: _sum_record_values(vehicle, "cost"),
     ),
     FuelioSensorDescription(
+        key="most_expensive_fill",
+        translation_key="most_expensive_fill",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:cash-plus",
+        value_fn=lambda vehicle: _extreme_record_value(vehicle, "cost", max),
+    ),
+    FuelioSensorDescription(
+        key="least_expensive_fill",
+        translation_key="least_expensive_fill",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:cash-minus",
+        value_fn=lambda vehicle: _extreme_record_value(vehicle, "cost", min),
+    ),
+    FuelioSensorDescription(
         key="total_volume",
         translation_key="total_volume",
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -188,12 +216,38 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         value_fn=lambda vehicle: _average_price(vehicle),
     ),
     FuelioSensorDescription(
+        key="average_price_5_fills",
+        translation_key="average_price_5_fills",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=3,
+        icon="mdi:chart-line-variant",
+        value_fn=lambda vehicle: _average_recent_record_values(
+            vehicle, "price_per_unit", 5
+        ),
+    ),
+    FuelioSensorDescription(
         key="average_consumption",
         translation_key="average_consumption",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
         icon="mdi:chart-line",
         value_fn=lambda vehicle: _average_record_values(vehicle, "consumption"),
+    ),
+    FuelioSensorDescription(
+        key="best_consumption",
+        translation_key="best_consumption",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:leaf",
+        value_fn=lambda vehicle: _extreme_record_value(vehicle, "consumption", min),
+    ),
+    FuelioSensorDescription(
+        key="worst_consumption",
+        translation_key="worst_consumption",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:leaf-off",
+        value_fn=lambda vehicle: _extreme_record_value(vehicle, "consumption", max),
     ),
     FuelioSensorDescription(
         key="average_consumption_30d",
@@ -214,6 +268,32 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         value_fn=lambda vehicle: _average_cost_per_km(vehicle),
     ),
     FuelioSensorDescription(
+        key="average_fill_volume",
+        translation_key="average_fill_volume",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="L",
+        suggested_display_precision=2,
+        icon="mdi:gas-station-in-use",
+        value_fn=lambda vehicle: _average_record_values(vehicle, "volume"),
+    ),
+    FuelioSensorDescription(
+        key="average_days_between_fills",
+        translation_key="average_days_between_fills",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="d",
+        icon="mdi:calendar-sync",
+        value_fn=lambda vehicle: _average_days_between_fills(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="average_distance_between_fills",
+        translation_key="average_distance_between_fills",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        suggested_display_precision=1,
+        icon="mdi:swap-horizontal-bold",
+        value_fn=lambda vehicle: _average_distance_between_fills(vehicle),
+    ),
+    FuelioSensorDescription(
         key="distance_this_month",
         translation_key="distance_this_month",
         state_class=SensorStateClass.MEASUREMENT,
@@ -221,6 +301,57 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         suggested_display_precision=1,
         icon="mdi:calendar-range",
         value_fn=lambda vehicle: _distance_current_month(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="last_month_cost",
+        translation_key="last_month_cost",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:cash-clock",
+        value_fn=lambda vehicle: _sum_cost_last_month(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="last_month_average_consumption",
+        translation_key="last_month_average_consumption",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:chart-timeline",
+        value_fn=lambda vehicle: _average_record_values_for_month(
+            vehicle, "consumption", previous_month=True
+        ),
+    ),
+    FuelioSensorDescription(
+        key="last_month_fill_count",
+        translation_key="last_month_fill_count",
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:counter",
+        value_fn=lambda vehicle: _fill_count_for_month(vehicle, previous_month=True),
+    ),
+    FuelioSensorDescription(
+        key="last_month_average_price",
+        translation_key="last_month_average_price",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=3,
+        icon="mdi:currency-eur",
+        value_fn=lambda vehicle: _average_record_values_for_month(
+            vehicle, "price_per_unit", previous_month=True
+        ),
+    ),
+    FuelioSensorDescription(
+        key="month_over_month_cost_delta",
+        translation_key="month_over_month_cost_delta",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:compare",
+        value_fn=lambda vehicle: _month_over_month_cost_delta(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="fuel_price_trend",
+        translation_key="fuel_price_trend",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=3,
+        icon="mdi:trending-up",
+        value_fn=lambda vehicle: _fuel_price_trend(vehicle),
     ),
     FuelioSensorDescription(
         key="days_since_full_tank",
@@ -254,6 +385,20 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         suggested_display_precision=3,
         icon="mdi:arrow-up-bold-circle",
         value_fn=lambda vehicle: _extreme_record_value(vehicle, "price_per_unit", max),
+    ),
+    FuelioSensorDescription(
+        key="different_stations_count",
+        translation_key="different_stations_count",
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:pump",
+        value_fn=lambda vehicle: _different_stations_count(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="different_cities_count",
+        translation_key="different_cities_count",
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:map-marker-multiple",
+        value_fn=lambda vehicle: _different_cities_count(vehicle),
     ),
 )
 
@@ -344,9 +489,19 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             "total_cost",
             "cost_30d",
             "fuel_cost_this_month",
+            "most_expensive_fill",
+            "least_expensive_fill",
+            "last_month_cost",
+            "month_over_month_cost_delta",
         }:
             return self.vehicle.currency
-        if self.entity_description.key in {"last_price_per_unit", "average_price"}:
+        if self.entity_description.key in {
+            "last_price_per_unit",
+            "average_price",
+            "average_price_5_fills",
+            "last_month_average_price",
+            "fuel_price_trend",
+        }:
             if self.vehicle.currency:
                 unit = self.vehicle.fuel_unit or "L"
                 return f"{self.vehicle.currency}/{unit}"
@@ -361,7 +516,11 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             if self.vehicle.currency:
                 distance_unit = self.vehicle.distance_unit or "km"
                 return f"{self.vehicle.currency}/{distance_unit}"
-        if self.entity_description.key in {"last_fill_volume", "total_volume"}:
+        if self.entity_description.key in {
+            "last_fill_volume",
+            "total_volume",
+            "average_fill_volume",
+        }:
             return self.vehicle.fuel_unit or "L"
         if self.entity_description.key in {
             "odometer",
@@ -369,6 +528,7 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             "tracked_distance",
             "km_since_full_tank",
             "distance_this_month",
+            "average_distance_between_fills",
         }:
             if self.vehicle.distance_unit == "mi":
                 return UnitOfLength.MILES
@@ -378,6 +538,9 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             "last_consumption",
             "average_consumption",
             "average_consumption_30d",
+            "best_consumption",
+            "worst_consumption",
+            "last_month_average_consumption",
         }:
             fuel_unit = self.vehicle.fuel_unit or "L"
             distance_unit = self.vehicle.distance_unit or "km"
@@ -414,6 +577,13 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         favorite_station = _favorite_station(self.vehicle)
         if favorite_station is not None:
             attrs["favorite_station"] = favorite_station
+        favorite_city = _favorite_city(self.vehicle)
+        if favorite_city is not None:
+            attrs["favorite_city"] = favorite_city
+        favorite_station_id = _favorite_station_id(self.vehicle)
+        if favorite_station_id is not None:
+            attrs["favorite_station_id"] = favorite_station_id
+        attrs["recent_cities"] = _recent_cities(self.vehicle, limit=3)
         if latest.fuel_type is not None:
             attrs["last_fuel_type"] = latest.fuel_type
         weather_desc = latest.weather.get("desc")
@@ -469,6 +639,20 @@ def _average_record_values(vehicle: ParsedVehicle, field: str) -> float | None:
     return round(sum(values) / len(values), 3)
 
 
+def _average_recent_record_values(
+    vehicle: ParsedVehicle, field: str, limit: int
+) -> float | None:
+    """Calculate an average across the most recent record values."""
+    values = [
+        getattr(record, field)
+        for record in vehicle.records[-limit:]
+        if getattr(record, field) is not None
+    ]
+    if not values:
+        return None
+    return round(sum(values) / len(values), 3)
+
+
 def _average_record_values_since_days(
     vehicle: ParsedVehicle, field: str, days: int
 ) -> float | None:
@@ -478,6 +662,23 @@ def _average_record_values_since_days(
         getattr(record, field)
         for record in vehicle.records
         if record.occurred_on.toordinal() >= cutoff and getattr(record, field) is not None
+    ]
+    if not values:
+        return None
+    return round(sum(values) / len(values), 3)
+
+
+def _average_record_values_for_month(
+    vehicle: ParsedVehicle, field: str, previous_month: bool = False
+) -> float | None:
+    """Calculate an average across a calendar month."""
+    year, month = _month_key(previous_month=previous_month)
+    values = [
+        getattr(record, field)
+        for record in vehicle.records
+        if record.occurred_on.year == year
+        and record.occurred_on.month == month
+        and getattr(record, field) is not None
     ]
     if not values:
         return None
@@ -551,6 +752,33 @@ def _average_cost_per_km(vehicle: ParsedVehicle) -> float | None:
     return round(total_cost / tracked_distance, 4)
 
 
+def _average_days_between_fills(vehicle: ParsedVehicle) -> float | None:
+    """Return average days between consecutive fill records."""
+    if len(vehicle.records) < 2:
+        return None
+    intervals = [
+        (vehicle.records[index].occurred_on - vehicle.records[index - 1].occurred_on).days
+        for index in range(1, len(vehicle.records))
+    ]
+    if not intervals:
+        return None
+    return round(sum(intervals) / len(intervals), 2)
+
+
+def _average_distance_between_fills(vehicle: ParsedVehicle) -> float | None:
+    """Return average odometer delta between consecutive fills."""
+    deltas = []
+    for index in range(1, len(vehicle.records)):
+        latest = vehicle.records[index].odometer
+        previous = vehicle.records[index - 1].odometer
+        if latest is None or previous is None:
+            continue
+        deltas.append(latest - previous)
+    if not deltas:
+        return None
+    return round(sum(deltas) / len(deltas), 3)
+
+
 def _distance_current_month(vehicle: ParsedVehicle) -> float | None:
     """Return tracked distance within the current month."""
     today = date.today()
@@ -564,6 +792,67 @@ def _distance_current_month(vehicle: ParsedVehicle) -> float | None:
     if len(month_records) < 2:
         return None
     return round(month_records[-1].odometer - month_records[0].odometer, 3)
+
+
+def _month_key(previous_month: bool = False) -> tuple[int, int]:
+    """Return a calendar month key for current or previous month."""
+    today = date.today()
+    year = today.year
+    month = today.month
+    if previous_month:
+        month -= 1
+        if month == 0:
+            month = 12
+            year -= 1
+    return year, month
+
+
+def _sum_cost_last_month(vehicle: ParsedVehicle) -> float | None:
+    """Return the sum of costs in the previous calendar month."""
+    year, month = _month_key(previous_month=True)
+    values = [
+        record.cost
+        for record in vehicle.records
+        if record.cost is not None
+        and record.occurred_on.year == year
+        and record.occurred_on.month == month
+    ]
+    if not values:
+        return None
+    return round(sum(values), 3)
+
+
+def _fill_count_for_month(vehicle: ParsedVehicle, previous_month: bool = False) -> int:
+    """Return the number of fills in the selected calendar month."""
+    year, month = _month_key(previous_month=previous_month)
+    return sum(
+        1
+        for record in vehicle.records
+        if record.occurred_on.year == year and record.occurred_on.month == month
+    )
+
+
+def _month_over_month_cost_delta(vehicle: ParsedVehicle) -> float | None:
+    """Return this month cost minus previous month cost."""
+    current = _sum_cost_current_month(vehicle)
+    previous = _sum_cost_last_month(vehicle)
+    if current is None or previous is None:
+        return None
+    return round(current - previous, 3)
+
+
+def _fuel_price_trend(vehicle: ParsedVehicle) -> float | None:
+    """Return recent average price minus previous recent average price."""
+    recent_records = [r for r in vehicle.records if r.price_per_unit is not None]
+    if len(recent_records) < 2:
+        return None
+    recent_values = [r.price_per_unit for r in recent_records[-5:]]
+    previous_values = [r.price_per_unit for r in recent_records[-10:-5]]
+    if not recent_values or not previous_values:
+        return None
+    recent_average = sum(recent_values) / len(recent_values)
+    previous_average = sum(previous_values) / len(previous_values)
+    return round(recent_average - previous_average, 3)
 
 
 def _find_last_full_record(vehicle: ParsedVehicle):
@@ -601,6 +890,44 @@ def _favorite_station(vehicle: ParsedVehicle) -> str | None:
     if not values:
         return None
     return Counter(values).most_common(1)[0][0]
+
+
+def _favorite_city(vehicle: ParsedVehicle) -> str | None:
+    """Return the most frequent city."""
+    values = [record.city for record in vehicle.records if record.city]
+    if not values:
+        return None
+    return Counter(values).most_common(1)[0][0]
+
+
+def _favorite_station_id(vehicle: ParsedVehicle) -> str | None:
+    """Return the most frequent station id."""
+    values = [record.station_id for record in vehicle.records if record.station_id]
+    if not values:
+        return None
+    return Counter(values).most_common(1)[0][0]
+
+
+def _different_stations_count(vehicle: ParsedVehicle) -> int:
+    """Return the number of unique station ids."""
+    return len({record.station_id for record in vehicle.records if record.station_id})
+
+
+def _different_cities_count(vehicle: ParsedVehicle) -> int:
+    """Return the number of unique cities."""
+    return len({record.city for record in vehicle.records if record.city})
+
+
+def _recent_cities(vehicle: ParsedVehicle, limit: int = 3) -> list[str]:
+    """Return the most recent non-empty fill cities."""
+    values: list[str] = []
+    for record in reversed(vehicle.records):
+        if not record.city:
+            continue
+        values.append(record.city)
+        if len(values) >= limit:
+            break
+    return values
 
 
 def _data_span_days(vehicle: ParsedVehicle) -> int:
