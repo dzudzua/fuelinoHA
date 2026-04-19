@@ -19,7 +19,7 @@
       }
     },
     "error": {
-      "invalid_folder": "The source path cannot be empty."
+      "invalid_source_path": "The source path cannot be empty."
     },
     "abort": {
       "already_configured": "This path is already configured.",
@@ -36,9 +36,7 @@
         }
       }
     },
-    "error": {
-      "invalid_folder": "The source path cannot be empty."
-    }
+    "error": {}
   },
   "entity": {
     "sensor": {
