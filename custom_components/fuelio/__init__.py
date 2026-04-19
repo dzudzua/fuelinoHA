@@ -53,7 +53,13 @@ class FuelioUploadView(HomeAssistantView):
 
     async def post(self, request: web.Request) -> web.Response:
         """Save an uploaded CSV file into the HA config folder."""
-        data = await request.post()
+        try:
+            data = await request.post()
+        except Exception as err:
+            return web.json_response(
+                {"error": "invalid_form_data", "detail": str(err)},
+                status=400,
+            )
         uploaded = data.get("file")
         if uploaded is None or not getattr(uploaded, "filename", ""):
             return web.json_response({"error": "missing_file"}, status=400)
@@ -182,9 +188,18 @@ class FuelioUploadPageView(HomeAssistantView):
           body: formData,
           credentials: "same-origin",
         }});
-        const result = await response.json();
+        const rawText = await response.text();
+        let result;
+        try {{
+          result = JSON.parse(rawText);
+        }} catch (parseError) {{
+          throw new Error("Ne-JSON odpoved: " + rawText.slice(0, 300));
+        }}
         if (!response.ok) {{
-          throw new Error(result.error || "upload_failed");
+          throw new Error(
+            (result.error || "upload_failed") +
+            (result.detail ? " - " + result.detail : "")
+          );
         }}
         status.textContent = "Hotovo.\\nUlozeno do: " + result.saved_path;
       }} catch (err) {{
