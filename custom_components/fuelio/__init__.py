@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from aiohttp import web
 
 from homeassistant.components.frontend import async_register_built_in_panel
@@ -11,25 +9,22 @@ from homeassistant.components.http import HomeAssistantView
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DEFAULT_UPLOAD_FOLDER, DOMAIN, PANEL_MODULE_URL, PANEL_URL_PATH, PLATFORMS
-
-_PANEL_JS_PATH = Path(__file__).with_name("panel.js")
+from .const import DEFAULT_UPLOAD_FOLDER, DOMAIN, PANEL_URL_PATH, PLATFORMS
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Fuelio integration."""
     hass.data.setdefault(DOMAIN, {})
-    hass.http.register_view(FuelioUploadPanelJsView(hass))
     hass.http.register_view(FuelioUploadView(hass))
+    hass.http.register_view(FuelioUploadPageView(hass))
     async_register_built_in_panel(
         hass,
-        component_name="custom",
+        component_name="iframe",
         frontend_url_path=PANEL_URL_PATH,
-        module_url=PANEL_MODULE_URL,
         sidebar_title="Fuelio Upload",
         sidebar_icon="mdi:file-upload-outline",
         require_admin=True,
-        config={"upload_folder": hass.config.path(DEFAULT_UPLOAD_FOLDER)},
+        config={"url": "/api/fuelio/upload-page"},
     )
     return True
 
@@ -53,26 +48,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unloaded:
         hass.data[DOMAIN].pop(entry.entry_id, None)
     return unloaded
-
-
-class FuelioUploadPanelJsView(HomeAssistantView):
-    """Serve the Fuelio upload panel JavaScript."""
-
-    url = PANEL_MODULE_URL
-    name = "api:fuelio:upload_panel_js"
-    requires_auth = True
-
-    def __init__(self, hass: HomeAssistant) -> None:
-        """Initialize the panel JS view."""
-        self.hass = hass
-
-    async def get(self, request: web.Request) -> web.Response:
-        """Return the panel JavaScript."""
-        content = await self.hass.async_add_executor_job(
-            _PANEL_JS_PATH.read_text,
-            "utf-8",
-        )
-        return web.Response(text=content, content_type="text/javascript")
 
 
 class FuelioUploadView(HomeAssistantView):
@@ -114,6 +89,118 @@ class FuelioUploadView(HomeAssistantView):
                 "saved_path": saved_path,
             }
         )
+
+
+class FuelioUploadPageView(HomeAssistantView):
+    """Serve a simple upload page for the sidebar iframe panel."""
+
+    url = "/api/fuelio/upload-page"
+    name = "api:fuelio:upload_page"
+    requires_auth = True
+
+    def __init__(self, hass: HomeAssistant) -> None:
+        """Initialize the upload page view."""
+        self.hass = hass
+
+    async def get(self, request: web.Request) -> web.Response:
+        """Return the upload page HTML."""
+        upload_folder = self.hass.config.path(DEFAULT_UPLOAD_FOLDER)
+        html = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Fuelio Upload</title>
+  <style>
+    body {{
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: #f3f4f6;
+    }}
+    .wrap {{
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 24px;
+    }}
+    .card {{
+      background: #1f2937;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }}
+    .path {{
+      background: #0f172a;
+      padding: 12px;
+      border-radius: 10px;
+      font-family: monospace;
+      margin: 16px 0 20px;
+      word-break: break-all;
+    }}
+    input[type=file] {{
+      display: block;
+      margin-bottom: 16px;
+      color: #f3f4f6;
+    }}
+    button {{
+      background: #2563eb;
+      border: 0;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }}
+    #status {{
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #0f172a;
+      white-space: pre-wrap;
+    }}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Fuelio CSV Upload</h1>
+      <p>Nahraj CSV export z pocitace nebo telefonu primo do Home Assistantu.</p>
+      <div class="path">{upload_folder}</div>
+      <input id="file" type="file" accept=".csv,text/csv">
+      <button id="upload">Upload CSV</button>
+      <div id="status">Pripraveno k uploadu.</div>
+    </div>
+  </div>
+  <script>
+    const status = document.getElementById("status");
+    document.getElementById("upload").addEventListener("click", async () => {{
+      const file = document.getElementById("file").files[0];
+      if (!file) {{
+        status.textContent = "Vyber CSV soubor.";
+        return;
+      }}
+      const formData = new FormData();
+      formData.append("file", file, file.name);
+      status.textContent = "Nahravam...";
+      try {{
+        const response = await fetch("/api/fuelio/upload", {{
+          method: "POST",
+          body: formData,
+          credentials: "same-origin",
+        }});
+        const result = await response.json();
+        if (!response.ok) {{
+          throw new Error(result.error || "upload_failed");
+        }}
+        status.textContent = "Hotovo.\\nUlozeno do: " + result.saved_path;
+      }} catch (err) {{
+        status.textContent = "Upload selhal: " + err.message;
+      }}
+    }});
+  </script>
+</body>
+</html>"""
+        return web.Response(text=html, content_type="text/html")
 
 
 def _save_uploaded_csv(upload_folder: str, filename: str, file_bytes: bytes) -> str:
