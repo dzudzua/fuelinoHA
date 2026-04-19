@@ -52,7 +52,10 @@ class FuelioDataUpdateCoordinator(DataUpdateCoordinator[FuelioData]):
         configured = self.config_entry.options.get(
             CONF_SOURCE_PATH, self.config_entry.data[CONF_SOURCE_PATH]
         )
-        return Path(configured).expanduser()
+        path = Path(configured).expanduser()
+        if path.is_absolute():
+            return path
+        return Path(self.hass.config.path(configured))
 
     async def _async_update_data(self) -> FuelioData:
         """Read and parse the configured CSV files."""

@@ -4,7 +4,7 @@ Custom Home Assistant integration for importing Fuelio backup CSV files.
 
 ## Version
 
-Current integration version: `0.2.0`
+Current integration version: `0.2.1`
 
 ## Installation
 
@@ -94,6 +94,7 @@ Do not commit your real Fuelio exports to a public repository. Keep personal CSV
 
 ## Changelog
 
+- `0.2.1`: relative source paths now resolve inside the Home Assistant config directory
 - `0.2.0`: added in-integration helper buttons and improved newest-file selection in folder mode
 - `0.1.19`: fixed upload refresh crash caused by non-coordinator data in runtime storage
 - `0.1.18`: fixed CSV upload crash caused by missing Path import
