@@ -6,6 +6,7 @@ DOMAIN = "fuelio"
 
 CONF_SOURCE_PATH = "source_path"
 CONF_SCAN_INTERVAL = "scan_interval"
+SERVICE_RELOAD = "reload"
 
 DEFAULT_SCAN_INTERVAL = 60
 PLATFORMS = ["sensor"]

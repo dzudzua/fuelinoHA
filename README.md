@@ -53,6 +53,16 @@ If you keep replacing the same CSV file with a newer export, the integration wil
 
 If you install via HACS instead of manual copy, only steps 2-4 are needed after installation.
 
+## Actions
+
+The integration provides one service action:
+
+- `fuelio.reload`: Refresh Fuelio CSV data immediately
+
+Optional service data:
+
+- `entry_id`: reload only one configured Fuelio entry; if omitted, all Fuelio entries are refreshed
+
 ## GitHub publishing
 
 Minimal flow:

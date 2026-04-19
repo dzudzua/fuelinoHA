@@ -1,0 +1,10 @@
+reload:
+  name: Reload Fuelio data
+  description: Refresh Fuelio CSV data immediately instead of waiting for the scan interval.
+  fields:
+    entry_id:
+      name: Config entry ID
+      description: Reload only one Fuelio configuration entry. If omitted, all Fuelio entries are refreshed.
+      required: false
+      selector:
+        text:
