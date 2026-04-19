@@ -12,3 +12,4 @@ DEFAULT_SCAN_INTERVAL = 60
 PLATFORMS = ["sensor"]
 DEFAULT_UPLOAD_FOLDER = "fuelino"
 PANEL_URL_PATH = "fuelio-upload"
+PANEL_MODULE_URL = "/api/fuelio/upload-panel.js"
