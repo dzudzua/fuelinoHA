@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import secrets
+
 from aiohttp import web
 
 from homeassistant.components.http import HomeAssistantView
@@ -14,6 +16,7 @@ from .const import DEFAULT_UPLOAD_FOLDER, DOMAIN, PANEL_URL_PATH, PLATFORMS
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Fuelio integration."""
     hass.data.setdefault(DOMAIN, {})
+    hass.data[DOMAIN]["upload_token"] = secrets.token_urlsafe(32)
     hass.http.register_view(FuelioUploadView(hass))
     hass.http.register_view(FuelioUploadPageView(hass))
     return True
@@ -45,7 +48,7 @@ class FuelioUploadView(HomeAssistantView):
 
     url = "/api/fuelio/upload"
     name = "api:fuelio:upload"
-    requires_auth = True
+    requires_auth = False
 
     def __init__(self, hass: HomeAssistant) -> None:
         """Initialize the upload view."""
@@ -53,6 +56,11 @@ class FuelioUploadView(HomeAssistantView):
 
     async def post(self, request: web.Request) -> web.Response:
         """Save an uploaded CSV file into the HA config folder."""
+        expected_token = self.hass.data.get(DOMAIN, {}).get("upload_token")
+        provided_token = request.headers.get("X-Fuelio-Upload-Token")
+        if not expected_token or provided_token != expected_token:
+            return web.json_response({"error": "unauthorized"}, status=401)
+
         try:
             data = await request.post()
         except Exception as err:
@@ -102,6 +110,7 @@ class FuelioUploadPageView(HomeAssistantView):
     async def get(self, request: web.Request) -> web.Response:
         """Return the upload page HTML."""
         upload_folder = self.hass.config.path(DEFAULT_UPLOAD_FOLDER)
+        upload_token = self.hass.data.get(DOMAIN, {}).get("upload_token", "")
         html = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -172,6 +181,7 @@ class FuelioUploadPageView(HomeAssistantView):
     </div>
   </div>
   <script>
+    const uploadToken = {upload_token!r};
     const status = document.getElementById("status");
     document.getElementById("upload").addEventListener("click", async () => {{
       const file = document.getElementById("file").files[0];
@@ -186,7 +196,9 @@ class FuelioUploadPageView(HomeAssistantView):
         const response = await fetch("/api/fuelio/upload", {{
           method: "POST",
           body: formData,
-          credentials: "same-origin",
+          headers: {{
+            "X-Fuelio-Upload-Token": uploadToken
+          }},
         }});
         const rawText = await response.text();
         let result;
