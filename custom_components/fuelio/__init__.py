@@ -2,18 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ENTRY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.update_coordinator import ConfigEntryNotReady
 
 from .const import DOMAIN, PLATFORMS, SERVICE_RELOAD
-from .coordinator import FuelioDataUpdateCoordinator
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
@@ -42,6 +38,8 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Fuelio from a config entry."""
+    from .coordinator import FuelioDataUpdateCoordinator
+
     coordinator = FuelioDataUpdateCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
 
@@ -57,8 +55,3 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unloaded:
         hass.data[DOMAIN].pop(entry.entry_id, None)
     return unloaded
-
-
-def _iter_coordinators(hass: HomeAssistant) -> Iterable[FuelioDataUpdateCoordinator]:
-    """Return all loaded Fuelio coordinators."""
-    return hass.data.get(DOMAIN, {}).values()
