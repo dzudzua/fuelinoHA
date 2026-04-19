@@ -4,7 +4,7 @@ Custom Home Assistant integration for importing Fuelio backup CSV files.
 
 ## Version
 
-Current integration version: `0.1.5`
+Current integration version: `0.1.6`
 
 ## Installation
 
@@ -57,16 +57,6 @@ If you keep replacing the same CSV file with a newer export, the integration wil
 
 If you install via HACS instead of manual copy, only steps 2-4 are needed after installation.
 
-## Actions
-
-The integration provides one service action:
-
-- `fuelio.reload`: Refresh Fuelio CSV data immediately
-
-Optional service data:
-
-- `entry_id`: reload only one configured Fuelio entry; if omitted, all Fuelio entries are refreshed
-
 ## GitHub publishing
 
 Minimal flow:
@@ -85,6 +75,7 @@ Do not commit your real Fuelio exports to a public repository. Keep personal CSV
 
 ## Changelog
 
+- `0.1.6`: minimized package init imports to troubleshoot config flow loading
 - `0.1.5`: lighter package import path to help config flow loading
 - `0.1.4`: simplified config flow compatibility, clearer manifest metadata
 - `0.1.3`: relaxed config flow source validation

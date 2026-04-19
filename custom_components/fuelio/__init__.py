@@ -2,37 +2,15 @@
 
 from __future__ import annotations
 
-import voluptuous as vol
-
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_ENTRY_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv
 
-from .const import DOMAIN, PLATFORMS, SERVICE_RELOAD
+from .const import DOMAIN, PLATFORMS
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Fuelio integration."""
     hass.data.setdefault(DOMAIN, {})
-
-    async def async_handle_reload(call) -> None:
-        """Reload one or all Fuelio coordinators."""
-        entry_id = call.data.get(CONF_ENTRY_ID)
-        if entry_id:
-            coordinators = [hass.data[DOMAIN][entry_id]]
-        else:
-            coordinators = list(_iter_coordinators(hass))
-
-        for coordinator in coordinators:
-            await coordinator.async_request_refresh()
-
-    hass.services.async_register(
-        DOMAIN,
-        SERVICE_RELOAD,
-        async_handle_reload,
-        schema=vol.Schema({vol.Optional(CONF_ENTRY_ID): cv.string}),
-    )
     return True
 
 
