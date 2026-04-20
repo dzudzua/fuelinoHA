@@ -4,7 +4,7 @@ Custom Home Assistant integration for importing Fuelio backup CSV files.
 
 ## Version
 
-Current integration version: `1.0.0`
+Current integration version: `0.9.0`
 
 ## What Fuelino supports
 
@@ -101,7 +101,7 @@ python -m compileall custom_components\fuelio tests examples
 
 ## Changelog
 
-- `1.0.0`: release-ready polish, richer dashboard including non-fuel expenses, and clearer first-use documentation
+- `0.9.0`: release-ready polish, richer dashboard including non-fuel expenses, and clearer first-use documentation
 - `0.7.1`: changed upload-help notifications to use a full Home Assistant URL when available
 - `0.7.0`: added parsing of Fuelio Costs/CostCategories plus non-fuel expense sensors and attributes
 - `0.6.1`: added Czech translations and a richer dashboard example for the new analytics
