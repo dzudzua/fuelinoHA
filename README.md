@@ -1,6 +1,6 @@
-# Fuelino
+# FuelinoHA
 
-Custom Home Assistant integration for importing Fuelio backup CSV files.
+FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV files through the Fuelino integration.
 
 ![Fuelino preview](assets/fuelino-showcase.png)
 

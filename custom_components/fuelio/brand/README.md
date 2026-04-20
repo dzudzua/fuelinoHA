@@ -1,4 +1,4 @@
-# Fuelio Brand Assets
+# FuelinoHA Brand Assets
 
 Place Home Assistant brand images for the custom integration in this folder.
 
@@ -19,3 +19,9 @@ Minimum practical setup:
 - `logo.png` for the integration logo
 
 Home Assistant 2026.3+ can load these local brand assets directly from the integration.
+
+You can also generate SVG variants with:
+
+```powershell
+python tools\generate_brand_svg.py
+```
