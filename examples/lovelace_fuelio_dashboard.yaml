@@ -147,6 +147,24 @@ sections:
       - type: tile
         entity: sensor.hyundai_i30_top_expense_category
         name: Nejvetsi kategorie vydaju
+      - type: tile
+        entity: sensor.hyundai_i30_service_cost_total
+        name: Celkem servis a udrzba
+      - type: tile
+        entity: sensor.hyundai_i30_wash_cost_total
+        name: Celkem myti
+      - type: tile
+        entity: sensor.hyundai_i30_registration_cost_total
+        name: Celkem registrace
+      - type: tile
+        entity: sensor.hyundai_i30_parking_cost_total
+        name: Celkem parkovani
+      - type: tile
+        entity: sensor.hyundai_i30_toll_cost_total
+        name: Celkem mytne
+      - type: tile
+        entity: sensor.hyundai_i30_insurance_cost_total
+        name: Celkem pojisteni
       - type: markdown
         title: Posledni vydaje
         content: >

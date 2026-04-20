@@ -117,6 +117,24 @@
       "total_vehicle_cost": {
         "name": "Total vehicle cost"
       },
+      "service_cost_total": {
+        "name": "Service and maintenance cost total"
+      },
+      "wash_cost_total": {
+        "name": "Wash cost total"
+      },
+      "registration_cost_total": {
+        "name": "Registration cost total"
+      },
+      "parking_cost_total": {
+        "name": "Parking cost total"
+      },
+      "toll_cost_total": {
+        "name": "Toll cost total"
+      },
+      "insurance_cost_total": {
+        "name": "Insurance cost total"
+      },
       "last_service_date": {
         "name": "Last service date"
       },

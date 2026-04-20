@@ -117,6 +117,24 @@
       "total_vehicle_cost": {
         "name": "Celkové náklady auta"
       },
+      "service_cost_total": {
+        "name": "Celkem servis a údržba"
+      },
+      "wash_cost_total": {
+        "name": "Celkem mytí"
+      },
+      "registration_cost_total": {
+        "name": "Celkem registrace"
+      },
+      "parking_cost_total": {
+        "name": "Celkem parkování"
+      },
+      "toll_cost_total": {
+        "name": "Celkem mýtné"
+      },
+      "insurance_cost_total": {
+        "name": "Celkem pojištění"
+      },
       "last_service_date": {
         "name": "Datum posledního servisu"
       },

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 from typing import Any
+import unicodedata
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -212,6 +213,66 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         suggested_display_precision=2,
         icon="mdi:car-wrench",
         value_fn=lambda vehicle: _total_vehicle_cost(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="service_cost_total",
+        translation_key="service_cost_total",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
+        icon="mdi:wrench",
+        value_fn=lambda vehicle: _expense_cost_for_aliases(
+            vehicle, {"service", "sluzba", "udrzba", "maintenance"}
+        ),
+    ),
+    FuelioSensorDescription(
+        key="wash_cost_total",
+        translation_key="wash_cost_total",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
+        icon="mdi:car-wash",
+        value_fn=lambda vehicle: _expense_cost_for_aliases(
+            vehicle, {"myti", "wash"}
+        ),
+    ),
+    FuelioSensorDescription(
+        key="registration_cost_total",
+        translation_key="registration_cost_total",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
+        icon="mdi:card-account-details",
+        value_fn=lambda vehicle: _expense_cost_for_aliases(
+            vehicle, {"registrace", "registration"}
+        ),
+    ),
+    FuelioSensorDescription(
+        key="parking_cost_total",
+        translation_key="parking_cost_total",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
+        icon="mdi:parking",
+        value_fn=lambda vehicle: _expense_cost_for_aliases(
+            vehicle, {"parkovani", "parking"}
+        ),
+    ),
+    FuelioSensorDescription(
+        key="toll_cost_total",
+        translation_key="toll_cost_total",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
+        icon="mdi:road-toll",
+        value_fn=lambda vehicle: _expense_cost_for_aliases(
+            vehicle, {"mytne", "toll"}
+        ),
+    ),
+    FuelioSensorDescription(
+        key="insurance_cost_total",
+        translation_key="insurance_cost_total",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
+        icon="mdi:shield-car",
+        value_fn=lambda vehicle: _expense_cost_for_aliases(
+            vehicle, {"pojisteni", "insurance"}
+        ),
     ),
     FuelioSensorDescription(
         key="last_service_date",
@@ -608,6 +669,12 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             "expense_cost_this_month",
             "total_expense_cost",
             "total_vehicle_cost",
+            "service_cost_total",
+            "wash_cost_total",
+            "registration_cost_total",
+            "parking_cost_total",
+            "toll_cost_total",
+            "insurance_cost_total",
             "last_service_cost",
             "last_trip_cost",
             "most_expensive_fill",
@@ -765,6 +832,38 @@ def _sum_expense_values(vehicle: ParsedVehicle, field: str) -> float | None:
         for expense in vehicle.expenses
         if getattr(expense, field) is not None and expense.is_income is not True
     ]
+    if not values:
+        return None
+    return round(sum(values), 3)
+
+
+def _normalize_expense_label(value: str | None) -> str:
+    """Normalize expense category labels for fuzzy matching."""
+    if not value:
+        return ""
+    normalized = unicodedata.normalize("NFKD", value)
+    return normalized.encode("ascii", "ignore").decode("ascii").lower()
+
+
+def _expense_cost_for_aliases(
+    vehicle: ParsedVehicle, aliases: set[str]
+) -> float | None:
+    """Sum non-fuel costs for matching category aliases."""
+    values = []
+    normalized_aliases = {_normalize_expense_label(alias) for alias in aliases}
+    for expense in vehicle.expenses:
+        if expense.cost is None or expense.is_income is True:
+            continue
+        haystacks = (
+            _normalize_expense_label(expense.category_name),
+            _normalize_expense_label(expense.title),
+        )
+        if any(
+            alias and alias in haystack
+            for alias in normalized_aliases
+            for haystack in haystacks
+        ):
+            values.append(expense.cost)
     if not values:
         return None
     return round(sum(values), 3)
