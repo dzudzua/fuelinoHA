@@ -10,6 +10,7 @@ from homeassistant.components.persistent_notification import async_create
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, PANEL_URL_PATH
@@ -87,7 +88,12 @@ class FuelioButton(CoordinatorEntity[FuelioDataUpdateCoordinator], ButtonEntity)
 
     async def async_show_upload_help(self) -> None:
         """Show upload instructions inside Home Assistant."""
-        upload_url = "/api/fuelio/upload-page"
+        upload_path = "/api/fuelio/upload-page"
+        try:
+            base_url = get_url(self.hass)
+            upload_url = f"{base_url}{upload_path}"
+        except NoURLAvailableError:
+            upload_url = upload_path
         source_path = self.coordinator.source_path
         message = (
             "Open the Fuelio upload page and upload a CSV export.\n\n"
