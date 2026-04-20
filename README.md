@@ -2,6 +2,8 @@
 
 Custom Home Assistant integration for importing Fuelio backup CSV files.
 
+![Fuelino preview](assets/fuelino-showcase.png)
+
 ## Version
 
 Current integration version: `0.9.4`
