@@ -43,6 +43,23 @@ class ExpenseRecord:
 
 
 @dataclass(slots=True)
+class TripRecord:
+    """Normalized trip record."""
+
+    started_on: date
+    title: str | None
+    start_name: str | None
+    end_name: str | None
+    distance_km: float | None
+    trip_cost: float | None
+    cost_per_km: float | None
+    duration_seconds: float | None
+    avg_speed: float | None
+    top_speed: float | None
+    raw: dict[str, str]
+
+
+@dataclass(slots=True)
 class ParsedVehicle:
     """Parsed data for a single vehicle."""
 
@@ -51,6 +68,7 @@ class ParsedVehicle:
     source_file: str
     records: list[FillRecord]
     expenses: list[ExpenseRecord]
+    trips: list[TripRecord]
     cost_categories: dict[str, str]
     currency: str | None
     fuel_unit: str | None
@@ -140,6 +158,7 @@ def _parse_sectioned_fuelio_file(path: Path, text: str) -> ParsedVehicle | None:
     log_rows = sections.get("log", [])
     cost_category_rows = sections.get("costcategories", [])
     cost_rows = sections.get("costs", [])
+    trip_rows = sections.get("triplog", [])
     if len(vehicle_rows) < 2 or len(log_rows) < 2:
         return None
 
@@ -147,6 +166,7 @@ def _parse_sectioned_fuelio_file(path: Path, text: str) -> ParsedVehicle | None:
     records: list[FillRecord] = []
     cost_categories = _parse_cost_categories(cost_category_rows)
     expenses = _parse_costs(cost_rows, cost_categories)
+    trips = _parse_trips(trip_rows)
 
     for row in log_rows[1:]:
         log_entry = _row_to_dict(log_rows[0], row)
@@ -193,6 +213,7 @@ def _parse_sectioned_fuelio_file(path: Path, text: str) -> ParsedVehicle | None:
         source_file=str(path),
         records=records,
         expenses=expenses,
+        trips=trips,
         cost_categories=cost_categories,
         currency=_clean_text(vehicle_info.get("Currency")),
         fuel_unit=FUEL_UNIT_MAP.get((vehicle_info.get("FuelUnit") or "").strip()),
@@ -274,6 +295,7 @@ def _parse_generic_csv_file(path: Path, text: str) -> ParsedVehicle | None:
         source_file=str(path),
         records=records,
         expenses=[],
+        trips=[],
         cost_categories={},
         currency=currency,
         fuel_unit=None,
@@ -499,3 +521,42 @@ def _parse_costs(
 
     expenses.sort(key=lambda item: item.occurred_on)
     return expenses
+
+
+def _parse_trips(rows: list[list[str]]) -> list[TripRecord]:
+    """Parse Fuelio trip log rows."""
+    if len(rows) < 2:
+        return []
+
+    trips: list[TripRecord] = []
+    headers = rows[0]
+    for row in rows[1:]:
+        entry = _row_to_dict(headers, row)
+        started_on = _parse_date(entry.get("StartDate"))
+        if started_on is None:
+            continue
+
+        distance_raw = _parse_number(entry.get("TripDist"))
+        distance_km = None
+        if distance_raw is not None:
+            distance_km = round(distance_raw / 1000, 3)
+
+        trip = TripRecord(
+            started_on=started_on,
+            title=_clean_text(entry.get("title")),
+            start_name=_clean_text(entry.get("StartName")),
+            end_name=_clean_text(entry.get("EndName")),
+            distance_km=distance_km,
+            trip_cost=_parse_number(entry.get("TripCost")),
+            cost_per_km=_parse_number(entry.get("TripCostKm")),
+            duration_seconds=_parse_number(entry.get("TripDuration")),
+            avg_speed=_parse_number(entry.get("TripAvgSpeed")),
+            top_speed=_parse_number(entry.get("TripTopSpeed")),
+            raw=entry,
+        )
+        if trip.distance_km is None and trip.trip_cost is None:
+            continue
+        trips.append(trip)
+
+    trips.sort(key=lambda item: item.started_on)
+    return trips

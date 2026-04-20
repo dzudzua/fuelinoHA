@@ -13,3 +13,7 @@
 "CostTitle","Date","Odo","CostTypeID","Notes","Cost","flag","idR","read","RemindOdo","RemindDate","isTemplate","RepeatOdo","RepeatMonths","isIncome","UniqueId","guid","lastupdated"
 "Battery service","2025-04-30 09:39","0","2","","1000.0","0","0","1","0","2011-01-01","0","0","0","0","37","expense-guid-1","1745998740000"
 "Wax wash","2026-03-24 14:40","0","6","","299.0","0","0","1","0","2011-01-01","0","0","0","0","47","expense-guid-2","1774359600000"
+"## TripLog"
+"title","StartName","StartLat","StartLong","StartDate","StartOdo","EndName","EndLat","EndLong","EndDate","EndOdo","TripCost","TripCategory","TripCostKm","TripNote","TripDist","TripLogFile","TripAvgSpeed","TripTopSpeed","TripDuration","TripShowLog","guid","lastupdated"
+"Morning drive","Prague","50.1194","14.5002","2024-01-14 09:43","0.0","Teplice","50.6866","13.8553","2024-01-14 10:41","0.0","434.60625","1","4.875","","89154.64054341707","trip-1","25.62","40.03","3479","0","trip-guid-1","1705225260000"
+"Afternoon drive","Teplice","50.6866","13.8553","2024-01-14 15:16","0.0","Prague","50.1145","14.5034","2024-01-14 16:54","0.0","462.04438","1","4.858","","95113.61966037564","trip-2","16.09","39.97","5910","0","trip-guid-2","1705247640000"

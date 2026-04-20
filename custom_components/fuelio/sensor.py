@@ -214,6 +214,27 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         value_fn=lambda vehicle: _total_vehicle_cost(vehicle),
     ),
     FuelioSensorDescription(
+        key="last_service_date",
+        translation_key="last_service_date",
+        device_class=SensorDeviceClass.DATE,
+        icon="mdi:wrench-clock",
+        value_fn=lambda vehicle: _last_service_date(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="last_service_cost",
+        translation_key="last_service_cost",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:car-wrench",
+        value_fn=lambda vehicle: _last_service_cost(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="top_expense_category",
+        translation_key="top_expense_category",
+        icon="mdi:shape-outline",
+        value_fn=lambda vehicle: _top_expense_category(vehicle),
+    ),
+    FuelioSensorDescription(
         key="fill_count_30d",
         translation_key="fill_count_30d",
         state_class=SensorStateClass.MEASUREMENT,
@@ -446,6 +467,54 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         icon="mdi:map-marker-multiple",
         value_fn=lambda vehicle: _different_cities_count(vehicle),
     ),
+    FuelioSensorDescription(
+        key="last_trip_date",
+        translation_key="last_trip_date",
+        device_class=SensorDeviceClass.DATE,
+        icon="mdi:calendar-arrow-right",
+        value_fn=lambda vehicle: _last_trip_date(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="last_trip_distance",
+        translation_key="last_trip_distance",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        suggested_display_precision=1,
+        icon="mdi:map-marker-path",
+        value_fn=lambda vehicle: _last_trip_distance(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="last_trip_cost",
+        translation_key="last_trip_cost",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:cash-fast",
+        value_fn=lambda vehicle: _last_trip_cost(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="trip_count",
+        translation_key="trip_count",
+        state_class=SensorStateClass.TOTAL,
+        icon="mdi:route",
+        value_fn=lambda vehicle: len(vehicle.trips),
+    ),
+    FuelioSensorDescription(
+        key="total_trip_distance",
+        translation_key="total_trip_distance",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        suggested_display_precision=1,
+        icon="mdi:routes",
+        value_fn=lambda vehicle: _sum_trip_values(vehicle, "distance_km"),
+    ),
+    FuelioSensorDescription(
+        key="average_trip_cost_per_km",
+        translation_key="average_trip_cost_per_km",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=3,
+        icon="mdi:car-speed-limiter",
+        value_fn=lambda vehicle: _average_trip_cost_per_km(vehicle),
+    ),
 )
 
 
@@ -539,6 +608,8 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             "expense_cost_this_month",
             "total_expense_cost",
             "total_vehicle_cost",
+            "last_service_cost",
+            "last_trip_cost",
             "most_expensive_fill",
             "least_expensive_fill",
             "last_month_cost",
@@ -555,6 +626,10 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             if self.vehicle.currency:
                 unit = self.vehicle.fuel_unit or "L"
                 return f"{self.vehicle.currency}/{unit}"
+        if self.entity_description.key == "average_trip_cost_per_km":
+            if self.vehicle.currency:
+                distance_unit = self.vehicle.distance_unit or "km"
+                return f"{self.vehicle.currency}/{distance_unit}"
         if self.entity_description.key in {
             "lowest_price_per_unit",
             "highest_price_per_unit",
@@ -579,6 +654,8 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             "km_since_full_tank",
             "distance_this_month",
             "average_distance_between_fills",
+            "last_trip_distance",
+            "total_trip_distance",
         }:
             if self.vehicle.distance_unit == "mi":
                 return UnitOfLength.MILES
@@ -646,6 +723,10 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         if last_expense is not None:
             attrs["last_expense_title"] = last_expense.title
             attrs["last_expense_category"] = last_expense.category_name
+        last_service = _last_service(self.vehicle)
+        if last_service is not None:
+            attrs["last_service_title"] = last_service.title
+            attrs["last_service_category"] = last_service.category_name
         attrs["data_span_days"] = _data_span_days(self.vehicle)
         attrs["partial_fill_count"] = _partial_fill_count(self.vehicle)
         attrs["full_tank_count"] = _full_tank_count(self.vehicle)
@@ -659,6 +740,9 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         attrs["monthly_summary"] = _monthly_summary(self.vehicle, limit=6)
         attrs["recent_expenses"] = _recent_expenses(self.vehicle, limit=5)
         attrs["expense_category_summary"] = _expense_category_summary(self.vehicle)
+        attrs["recent_trips"] = _recent_trips(self.vehicle, limit=5)
+        top_expense_categories = _expense_category_summary(self.vehicle)
+        attrs["top_expense_categories"] = top_expense_categories[:3]
         return attrs
 
 
@@ -686,6 +770,18 @@ def _sum_expense_values(vehicle: ParsedVehicle, field: str) -> float | None:
     return round(sum(values), 3)
 
 
+def _sum_trip_values(vehicle: ParsedVehicle, field: str) -> float | None:
+    """Sum numeric trip values."""
+    values = [
+        getattr(trip, field)
+        for trip in vehicle.trips
+        if getattr(trip, field) is not None
+    ]
+    if not values:
+        return None
+    return round(sum(values), 3)
+
+
 def _average_price(vehicle: ParsedVehicle) -> float | None:
     """Calculate average price per liter from totals."""
     total_cost = _sum_record_values(vehicle, "cost")
@@ -702,6 +798,25 @@ def _last_expense(vehicle: ParsedVehicle):
     return vehicle.expenses[-1]
 
 
+def _last_service(vehicle: ParsedVehicle):
+    """Return the newest service-like expense."""
+    service_keywords = {
+        "service",
+        "servis",
+        "udrzba",
+        "udržba",
+        "maintenance",
+        "slużba",
+        "sluzba",
+    }
+    for expense in reversed(vehicle.expenses):
+        category = (expense.category_name or "").lower()
+        title = (expense.title or "").lower()
+        if any(keyword in category or keyword in title for keyword in service_keywords):
+            return expense
+    return None
+
+
 def _last_expense_date(vehicle: ParsedVehicle) -> date | None:
     """Return the date of the newest expense."""
     latest = _last_expense(vehicle)
@@ -714,6 +829,57 @@ def _last_expense_cost(vehicle: ParsedVehicle) -> float | None:
     if latest is None:
         return None
     return latest.cost
+
+
+def _last_service_date(vehicle: ParsedVehicle) -> date | None:
+    """Return the date of the newest service-like expense."""
+    latest = _last_service(vehicle)
+    return latest.occurred_on if latest is not None else None
+
+
+def _last_service_cost(vehicle: ParsedVehicle) -> float | None:
+    """Return the cost of the newest service-like expense."""
+    latest = _last_service(vehicle)
+    if latest is None:
+        return None
+    return latest.cost
+
+
+def _top_expense_category(vehicle: ParsedVehicle) -> str | None:
+    """Return the expense category with the highest summed cost."""
+    summary = _expense_category_summary(vehicle)
+    if not summary:
+        return None
+    return summary[0]["category_name"]
+
+
+def _last_trip(vehicle: ParsedVehicle):
+    """Return the newest parsed trip if available."""
+    if not vehicle.trips:
+        return None
+    return vehicle.trips[-1]
+
+
+def _last_trip_date(vehicle: ParsedVehicle) -> date | None:
+    """Return the date of the newest trip."""
+    latest = _last_trip(vehicle)
+    return latest.started_on if latest is not None else None
+
+
+def _last_trip_distance(vehicle: ParsedVehicle) -> float | None:
+    """Return the distance of the newest trip."""
+    latest = _last_trip(vehicle)
+    if latest is None:
+        return None
+    return latest.distance_km
+
+
+def _last_trip_cost(vehicle: ParsedVehicle) -> float | None:
+    """Return the cost of the newest trip."""
+    latest = _last_trip(vehicle)
+    if latest is None:
+        return None
+    return latest.trip_cost
 
 
 def _average_record_values(vehicle: ParsedVehicle, field: str) -> float | None:
@@ -954,6 +1120,15 @@ def _total_vehicle_cost(vehicle: ParsedVehicle) -> float | None:
     if total == 0:
         return None
     return round(total, 3)
+
+
+def _average_trip_cost_per_km(vehicle: ParsedVehicle) -> float | None:
+    """Return average trip cost per distance unit."""
+    total_cost = _sum_trip_values(vehicle, "trip_cost")
+    total_distance = _sum_trip_values(vehicle, "distance_km")
+    if not total_cost or not total_distance:
+        return None
+    return round(total_cost / total_distance, 4)
 
 
 def _fuel_price_trend(vehicle: ParsedVehicle) -> float | None:
@@ -1210,6 +1385,25 @@ def _expense_category_summary(vehicle: ParsedVehicle) -> list[dict[str, Any]]:
     for item in result:
         item["total_cost"] = round(item["total_cost"], 2)
     return result
+
+
+def _recent_trips(vehicle: ParsedVehicle, limit: int = 5) -> list[dict[str, Any]]:
+    """Return a compact summary of the most recent trips."""
+    recent = list(reversed(vehicle.trips[-limit:]))
+    rows: list[dict[str, Any]] = []
+    for trip in recent:
+        rows.append(
+            {
+                "date": trip.started_on.isoformat(),
+                "title": trip.title,
+                "start_name": trip.start_name,
+                "end_name": trip.end_name,
+                "distance_km": trip.distance_km,
+                "trip_cost": trip.trip_cost,
+                "cost_per_km": trip.cost_per_km,
+            }
+        )
+    return rows
 
 
 def _safe_float(value: Any) -> float | None:

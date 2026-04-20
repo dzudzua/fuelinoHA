@@ -138,6 +138,15 @@ sections:
       - type: tile
         entity: sensor.hyundai_i30_total_expense_cost
         name: Celkove ostatni vydaje
+      - type: tile
+        entity: sensor.hyundai_i30_last_service_date
+        name: Posledni servis
+      - type: tile
+        entity: sensor.hyundai_i30_last_service_cost
+        name: Cena posledniho servisu
+      - type: tile
+        entity: sensor.hyundai_i30_top_expense_category
+        name: Nejvetsi kategorie vydaju
       - type: markdown
         title: Posledni vydaje
         content: >
@@ -153,6 +162,37 @@ sections:
           {% for category in categories %}
           - **{{ category.category_name }}** | pocet: {{ category.count }} |
           celkem: {{ category.total_cost }}
+          {% endfor %}
+  - type: grid
+    cards:
+      - type: heading
+        heading: TripLog a jizdy
+      - type: tile
+        entity: sensor.hyundai_i30_last_trip_date
+        name: Posledni jizda
+      - type: tile
+        entity: sensor.hyundai_i30_last_trip_distance
+        name: Vzdalenost posledni jizdy
+      - type: tile
+        entity: sensor.hyundai_i30_last_trip_cost
+        name: Cena posledni jizdy
+      - type: tile
+        entity: sensor.hyundai_i30_trip_count
+        name: Pocet jizd
+      - type: tile
+        entity: sensor.hyundai_i30_total_trip_distance
+        name: Celkova vzdalenost jizd
+      - type: tile
+        entity: sensor.hyundai_i30_average_trip_cost_per_km
+        name: Prumerna cena jizdy za km
+      - type: markdown
+        title: Posledni jizdy
+        content: >
+          {% set trips = state_attr('sensor.hyundai_i30_last_fill_date', 'recent_trips') or [] %}
+          {% for trip in trips %}
+          - **{{ trip.date }}** | {{ trip.title or 'Bez nazvu' }} |
+          {{ trip.distance_km }} km | {{ trip.trip_cost }} |
+          {{ trip.start_name or 'Start' }} -> {{ trip.end_name or 'Cil' }}
           {% endfor %}
   - type: grid
     cards:

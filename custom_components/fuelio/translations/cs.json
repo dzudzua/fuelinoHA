@@ -117,6 +117,15 @@
       "total_vehicle_cost": {
         "name": "Celkové náklady auta"
       },
+      "last_service_date": {
+        "name": "Datum posledního servisu"
+      },
+      "last_service_cost": {
+        "name": "Cena posledního servisu"
+      },
+      "top_expense_category": {
+        "name": "Největší kategorie výdajů"
+      },
       "fill_count_30d": {
         "name": "Počet tankování za 30 dní"
       },
@@ -200,6 +209,24 @@
       },
       "different_cities_count": {
         "name": "Počet různých měst"
+      },
+      "last_trip_date": {
+        "name": "Datum poslední jízdy"
+      },
+      "last_trip_distance": {
+        "name": "Vzdálenost poslední jízdy"
+      },
+      "last_trip_cost": {
+        "name": "Cena poslední jízdy"
+      },
+      "trip_count": {
+        "name": "Počet jízd"
+      },
+      "total_trip_distance": {
+        "name": "Celková vzdálenost jízd"
+      },
+      "average_trip_cost_per_km": {
+        "name": "Průměrná cena jízdy na vzdálenost"
       }
     }
   }

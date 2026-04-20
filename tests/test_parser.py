@@ -75,6 +75,16 @@ class FuelioParserTests(unittest.TestCase):
         self.assertEqual(latest_expense.category_name, "Car wash")
         self.assertEqual(latest_expense.cost, 299.0)
 
+    def test_triplog_sections_are_parsed(self) -> None:
+        """Fuelio trip log sections should become trip records."""
+        self.assertEqual(len(self.parsed.trips), 2)
+        latest_trip = self.parsed.trips[-1]
+        self.assertEqual(str(latest_trip.started_on), "2024-01-14")
+        self.assertEqual(latest_trip.title, "Afternoon drive")
+        self.assertEqual(latest_trip.end_name, "Prague")
+        self.assertAlmostEqual(latest_trip.distance_km, 95.114, places=3)
+        self.assertAlmostEqual(latest_trip.trip_cost, 462.04438, places=5)
+
 
 if __name__ == "__main__":
     unittest.main()

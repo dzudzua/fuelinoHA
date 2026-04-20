@@ -117,6 +117,15 @@
       "total_vehicle_cost": {
         "name": "Total vehicle cost"
       },
+      "last_service_date": {
+        "name": "Last service date"
+      },
+      "last_service_cost": {
+        "name": "Last service cost"
+      },
+      "top_expense_category": {
+        "name": "Top expense category"
+      },
       "fill_count_30d": {
         "name": "Fill count 30 days"
       },
@@ -200,6 +209,24 @@
       },
       "different_cities_count": {
         "name": "Different cities count"
+      },
+      "last_trip_date": {
+        "name": "Last trip date"
+      },
+      "last_trip_distance": {
+        "name": "Last trip distance"
+      },
+      "last_trip_cost": {
+        "name": "Last trip cost"
+      },
+      "trip_count": {
+        "name": "Trip count"
+      },
+      "total_trip_distance": {
+        "name": "Total trip distance"
+      },
+      "average_trip_cost_per_km": {
+        "name": "Average trip cost per distance"
       }
     }
   }
