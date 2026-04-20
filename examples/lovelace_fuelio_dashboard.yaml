@@ -6,114 +6,117 @@ sections:
   - type: grid
     cards:
       - type: heading
-        heading: Auto a poslední tankování
+        heading: Auto a posledni tankovani
       - type: tile
         entity: sensor.hyundai_i30_last_fill_date
-        name: Poslední tankování
+        name: Posledni tankovani
       - type: tile
         entity: sensor.hyundai_i30_last_fill_cost
-        name: Poslední cena
+        name: Posledni cena
       - type: tile
         entity: sensor.hyundai_i30_last_fill_volume
-        name: Poslední objem
+        name: Posledni objem
       - type: tile
         entity: sensor.hyundai_i30_last_price_per_unit
         name: Cena za litr
       - type: tile
         entity: sensor.hyundai_i30_last_consumption
-        name: Poslední spotřeba
+        name: Posledni spotreba
       - type: tile
         entity: sensor.hyundai_i30_last_city
-        name: Poslední město
+        name: Posledni mesto
       - type: tile
         entity: sensor.hyundai_i30_odometer
         name: Tachometr
       - type: tile
         entity: sensor.hyundai_i30_days_since_full_tank
-        name: Dnů od plné nádrže
+        name: Dnu od plne nadrze
       - type: tile
         entity: sensor.hyundai_i30_km_since_full_tank
-        name: Km od plné nádrže
+        name: Km od plne nadrze
   - type: grid
     cards:
       - type: heading
-        heading: Náklady a trend
+        heading: Naklady a trend
       - type: statistic
         entity: sensor.hyundai_i30_fuel_cost_this_month
-        name: Náklady tento měsíc
+        name: Palivo tento mesic
+      - type: statistic
+        entity: sensor.hyundai_i30_expense_cost_this_month
+        name: Ostatni vydaje tento mesic
+      - type: statistic
+        entity: sensor.hyundai_i30_total_vehicle_cost
+        name: Celkove naklady auta
       - type: statistic
         entity: sensor.hyundai_i30_last_month_cost
-        name: Náklady minulý měsíc
+        name: Palivo minuly mesic
       - type: statistic
         entity: sensor.hyundai_i30_month_over_month_cost_delta
-        name: Rozdíl proti minulému měsíci
+        name: Rozdil proti minulemu mesici
       - type: statistic
         entity: sensor.hyundai_i30_cost_30d
-        name: Náklady za 30 dní
+        name: Palivo za 30 dni
       - type: statistic
         entity: sensor.hyundai_i30_average_cost_per_km
-        name: Průměrná cena / km
+        name: Prumerna cena za km
       - type: statistic
         entity: sensor.hyundai_i30_fuel_price_trend
         name: Trend ceny paliva
       - type: statistic
-        entity: sensor.hyundai_i30_average_price
-        name: Průměrná cena
-      - type: statistic
         entity: sensor.hyundai_i30_average_price_5_fills
-        name: Průměrná cena 5 tankování
+        name: Prumerna cena 5 tankovani
   - type: grid
     cards:
       - type: heading
-        heading: Spotřeba a jízdní profil
+        heading: Spotreba a jizdni profil
       - type: tile
         entity: sensor.hyundai_i30_average_consumption
-        name: Průměrná spotřeba
+        name: Prumerna spotreba
       - type: tile
         entity: sensor.hyundai_i30_average_consumption_30d
-        name: Spotřeba za 30 dní
+        name: Spotreba za 30 dni
       - type: tile
         entity: sensor.hyundai_i30_last_month_average_consumption
-        name: Spotřeba minulý měsíc
+        name: Spotreba minuly mesic
       - type: tile
         entity: sensor.hyundai_i30_best_consumption
-        name: Nejlepší spotřeba
+        name: Nejlepsi spotreba
       - type: tile
         entity: sensor.hyundai_i30_worst_consumption
-        name: Nejhorší spotřeba
+        name: Nejhorsi spotreba
       - type: tile
         entity: sensor.hyundai_i30_average_fill_volume
-        name: Průměrný objem tankování
+        name: Prumerny objem tankovani
       - type: tile
         entity: sensor.hyundai_i30_average_days_between_fills
-        name: Průměr dnů mezi tankováními
+        name: Prumer dnu mezi tankovanimi
       - type: tile
         entity: sensor.hyundai_i30_average_distance_between_fills
-        name: Průměrná vzdálenost mezi tankováními
+        name: Prumerna vzdalenost mezi tankovanimi
       - type: tile
         entity: sensor.hyundai_i30_distance_this_month
-        name: Vzdálenost tento měsíc
+        name: Vzdalenost tento mesic
   - type: grid
     cards:
       - type: heading
-        heading: Pumpy a místa
+        heading: Pumpy a mista
       - type: tile
         entity: sensor.hyundai_i30_favorite_station
-        name: Nejčastější pumpa
+        name: Nejcastejsi pumpa
       - type: tile
         entity: sensor.hyundai_i30_favorite_station_id
-        name: Nejčastější ID pumpy
+        name: Nejcastejsi ID pumpy
       - type: tile
         entity: sensor.hyundai_i30_favorite_city
-        name: Nejčastější město
+        name: Nejcastejsi mesto
       - type: tile
         entity: sensor.hyundai_i30_different_stations_count
-        name: Různé pumpy
+        name: Ruzne pumpy
       - type: tile
         entity: sensor.hyundai_i30_different_cities_count
-        name: Různá města
+        name: Ruzna mesta
       - type: markdown
-        title: Poslední 3 města
+        title: Posledni 3 mesta
         content: >
           {% set cities = state_attr('sensor.hyundai_i30_last_fill_date', 'recent_cities') or [] %}
           {% for city in cities %}
@@ -122,55 +125,87 @@ sections:
   - type: grid
     cards:
       - type: heading
+        heading: Servis a ostatni vydaje
+      - type: tile
+        entity: sensor.hyundai_i30_last_expense_date
+        name: Posledni vydaj
+      - type: tile
+        entity: sensor.hyundai_i30_last_expense_cost
+        name: Cena posledniho vydaje
+      - type: tile
+        entity: sensor.hyundai_i30_expense_count
+        name: Pocet vydaju
+      - type: tile
+        entity: sensor.hyundai_i30_total_expense_cost
+        name: Celkove ostatni vydaje
+      - type: markdown
+        title: Posledni vydaje
+        content: >
+          {% set expenses = state_attr('sensor.hyundai_i30_last_fill_date', 'recent_expenses') or [] %}
+          {% for expense in expenses %}
+          - **{{ expense.date }}** | {{ expense.title or 'Bez nazvu' }} |
+          {{ expense.cost }} | {{ expense.category_name or 'Bez kategorie' }}
+          {% endfor %}
+      - type: markdown
+        title: Souhrn kategorii vydaju
+        content: >
+          {% set categories = state_attr('sensor.hyundai_i30_last_fill_date', 'expense_category_summary') or [] %}
+          {% for category in categories %}
+          - **{{ category.category_name }}** | pocet: {{ category.count }} |
+          celkem: {{ category.total_cost }}
+          {% endfor %}
+  - type: grid
+    cards:
+      - type: heading
         heading: Rekordy
       - type: tile
         entity: sensor.hyundai_i30_lowest_price_per_unit
-        name: Nejnižší cena
+        name: Nejnizsi cena
       - type: tile
         entity: sensor.hyundai_i30_highest_price_per_unit
-        name: Nejvyšší cena
+        name: Nejvyssi cena
       - type: tile
         entity: sensor.hyundai_i30_most_expensive_fill
-        name: Nejdražší tankování
+        name: Nejdrazsi tankovani
       - type: tile
         entity: sensor.hyundai_i30_least_expensive_fill
-        name: Nejlevnější tankování
+        name: Nejlevnejsi tankovani
       - type: tile
         entity: sensor.hyundai_i30_last_fill_temperature
-        name: Teplota při tankování
+        name: Teplota pri tankovani
       - type: tile
         entity: sensor.hyundai_i30_fill_count
-        name: Celkový počet tankování
+        name: Celkovy pocet tankovani
       - type: tile
         entity: sensor.hyundai_i30_last_month_fill_count
-        name: Tankování minulý měsíc
+        name: Tankovani minuly mesic
       - type: tile
         entity: sensor.hyundai_i30_fill_count_30d
-        name: Tankování za 30 dní
+        name: Tankovani za 30 dni
       - type: tile
         entity: sensor.hyundai_i30_tracked_distance
-        name: Sledovaná vzdálenost
+        name: Sledovana vzdalenost
   - type: grid
     cards:
       - type: heading
         heading: Historie
       - type: markdown
-        title: Poslední tankování
+        title: Posledni tankovani
         content: >
           {% set fills = state_attr('sensor.hyundai_i30_last_fill_date', 'recent_fills') or [] %}
           {% for fill in fills %}
           - **{{ fill.date }}** | {{ fill.volume }} L | {{ fill.cost }} |
-          {{ fill.city or fill.station_id or 'Neznámá pumpa' }} |
-          {{ 'částečné' if fill.is_partial else 'plné' }}{% if fill.temperature is not none %}
-          | {{ fill.temperature }} °C{% endif %}{% if fill.weather_description %}
+          {{ fill.city or fill.station_id or 'Neznama pumpa' }} |
+          {{ 'castecne' if fill.is_partial else 'plne' }}{% if fill.temperature is not none %}
+          | {{ fill.temperature }} C{% endif %}{% if fill.weather_description %}
           | {{ fill.weather_description }}{% endif %}
           {% endfor %}
       - type: markdown
-        title: Měsíční souhrn
+        title: Mesicni souhrn
         content: >
           {% set months = state_attr('sensor.hyundai_i30_last_fill_date', 'monthly_summary') or [] %}
           {% for month in months %}
-          - **{{ month.year }}-{{ '%02d'|format(month.month) }}** | tankování: {{ month.fill_count }} |
-          náklady: {{ month.total_cost }} | objem: {{ month.total_volume }} |
-          vzdálenost: {{ month.distance }} | průměrná cena: {{ month.average_price }}
+          - **{{ month.year }}-{{ '%02d'|format(month.month) }}** | tankovani: {{ month.fill_count }} |
+          naklady: {{ month.total_cost }} | objem: {{ month.total_volume }} |
+          vzdalenost: {{ month.distance }} | prumerna cena: {{ month.average_price }}
           {% endfor %}

@@ -4,29 +4,78 @@ Custom Home Assistant integration for importing Fuelio backup CSV files.
 
 ## Version
 
-Current integration version: `0.7.1`
+Current integration version: `1.0.0`
 
-## Installation
+## What Fuelino supports
 
-Recommended installation path:
+- Fuelio CSV import from a local file or folder
+- automatic vehicle discovery from Fuelio exports
+- fuel statistics and driving analytics
+- city, station, weather and history insights
+- non-fuel costs from Fuelio `Costs` and `CostCategories`
+- ready-to-adapt Lovelace dashboard example
+
+## Recommended installation
 
 1. Push this repository to GitHub
 2. In Home Assistant, open HACS
 3. Add this GitHub repository as a custom repository of type `Integration`
-4. Install `Fuelino` from HACS
+4. Install `Fuelino`
 5. Restart Home Assistant
 
-## MVP scope
+## First use
 
-- Reads Fuelio CSV backups from a local folder
-- Creates sensors per discovered vehicle/file
-- Parses refueling history with tolerant header matching
-- Supports Fuelio's native sectioned export with `## Vehicle` and `## Log`
-- Designed to become HACS-installable once the parser is validated on real exports
+Recommended workflow:
 
-## Expected source files
+1. Put your Fuelio export into Home Assistant storage, for example `/config/fuelino/`
+2. Add the `Fuelio` integration from the Home Assistant UI
+3. Set the source path to either:
+   - one CSV file
+   - or a folder like `/config/fuelino`
+4. If using a folder, Fuelino will prefer the newest CSV per vehicle
 
-The integration can read either:
+If you keep replacing the same export or keep uploading newer CSV files into the folder, Fuelino will refresh on the configured scan interval.
+
+## Upload page
+
+Fuelino includes a built-in upload page inside Home Assistant.
+
+- Open `/api/fuelio/upload-page` in your Home Assistant session
+- Alias URL `/fuelio-upload` should also work
+- Pick a CSV file from your phone or computer
+- The file is stored into the Home Assistant config folder under `fuelino/`
+
+Note:
+- local-network use is the most reliable workflow for the upload page
+
+## In-Integration actions
+
+Fuelio exposes helper buttons inside Home Assistant:
+
+- `Open upload help`
+- `Reload data`
+
+## Dashboard example
+
+A ready-to-adapt Lovelace example is available in:
+
+- `examples/lovelace_fuelio_dashboard.yaml`
+
+It includes:
+
+- fuel overview
+- cost and trend section
+- driving profile and consumption
+- station and city insights
+- service and other vehicle expenses
+- recent fill history
+- monthly summary
+
+Rename entity ids there to match your own vehicle slug if needed.
+
+## Source files
+
+Fuelino can read either:
 
 - one specific CSV file
 - one folder containing Fuelio CSV exports
@@ -38,70 +87,21 @@ When a folder is configured, it scans:
 
 Each CSV file is treated as one vehicle dataset unless a recognizable vehicle name is present in the file.
 
-## Local development
+## Privacy
 
-Copy `custom_components/fuelio` into your Home Assistant config directory and add the integration from the UI.
+Do not commit your real Fuelio exports to a public repository.
+Keep personal CSV backups out of git and only point Home Assistant to local files stored inside your HA config.
 
-Recommended next step: drop a few real Fuelio backup files into a test folder and tune the parser against them.
-
-## Home Assistant usage
-
-Recommended workflow for your own Home Assistant:
-
-1. Copy this integration to `/config/custom_components/fuelio/`
-2. Place your Fuelio export into Home Assistant storage, for example `/config/fuelio/hjundaj.csv`
-3. Add the integration from the Home Assistant UI
-4. In setup, enter either the full CSV path or the folder path
-
-If you keep replacing the same CSV file with a newer export, the integration will refresh it on the configured scan interval.
-
-If you install via HACS instead of manual copy, only steps 2-4 are needed after installation.
-
-## Upload panel
-
-The integration now includes a built-in upload page inside Home Assistant.
-
-- Open `/api/fuelio/upload-page` in your Home Assistant browser session
-- Alias URL `/fuelio-upload` should also work
-- Pick a CSV file from your phone or computer
-- The file is stored into the Home Assistant config folder under `fuelino/`
-- Loaded Fuelio entries are refreshed automatically after upload
-
-## In-Integration Actions
-
-Fuelio now also exposes helper buttons directly inside Home Assistant:
-
-- `Open upload help`: shows the upload URL and the configured source path
-- `Reload data`: refreshes Fuelio data immediately
-
-When the configured source path is a folder, Fuelio now prefers the newest CSV per vehicle.
-
-## Dashboard Example
-
-A ready-to-adapt Lovelace example is available in:
-
-- `examples/lovelace_fuelio_dashboard.yaml`
-
-Rename entity ids there to match your own vehicle slug if needed.
-
-## GitHub publishing
-
-Minimal flow:
+## Tests
 
 ```powershell
-git add .
-git commit -m "Initial Fuelino integration"
-git branch -M main
-git remote add origin https://github.com/<your-user>/<your-repo>.git
-git push -u origin main
+python -m unittest tests.test_parser
+python -m compileall custom_components\fuelio tests examples
 ```
-
-Then add the repository URL in HACS as a custom integration source.
-
-Do not commit your real Fuelio exports to a public repository. Keep personal CSV backups out of git and only point Home Assistant to local files stored inside your HA config.
 
 ## Changelog
 
+- `1.0.0`: release-ready polish, richer dashboard including non-fuel expenses, and clearer first-use documentation
 - `0.7.1`: changed upload-help notifications to use a full Home Assistant URL when available
 - `0.7.0`: added parsing of Fuelio Costs/CostCategories plus non-fuel expense sensors and attributes
 - `0.6.1`: added Czech translations and a richer dashboard example for the new analytics
@@ -136,11 +136,3 @@ Do not commit your real Fuelio exports to a public repository. Keep personal CSV
 - `0.1.2`: added `fuelio.reload` service
 - `0.1.1`: parser and sensor improvements for real Fuelio exports
 - `0.1.0`: initial custom integration MVP
-
-## Tests
-
-The parser regression tests use the sample export in the project root:
-
-```powershell
-python -m unittest tests.test_parser
-```
