@@ -4,7 +4,7 @@ Custom Home Assistant integration for importing Fuelio backup CSV files.
 
 ## Version
 
-Current integration version: `0.9.1`
+Current integration version: `0.9.2`
 
 ## What Fuelino supports
 
@@ -101,6 +101,7 @@ python -m compileall custom_components\fuelio tests examples
 
 ## Changelog
 
+- `0.9.2`: added diagnostics support for config-entry troubleshooting and release validation
 - `0.9.1`: added TripLog parsing, trip sensors, better service highlights, and a smarter expense dashboard
 - `0.9.0`: release-ready polish, richer dashboard including non-fuel expenses, and clearer first-use documentation
 - `0.7.1`: changed upload-help notifications to use a full Home Assistant URL when available
