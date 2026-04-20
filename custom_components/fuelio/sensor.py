@@ -168,6 +168,52 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         value_fn=lambda vehicle: _sum_cost_current_month(vehicle),
     ),
     FuelioSensorDescription(
+        key="last_expense_date",
+        translation_key="last_expense_date",
+        device_class=SensorDeviceClass.DATE,
+        icon="mdi:calendar-star",
+        value_fn=lambda vehicle: _last_expense_date(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="last_expense_cost",
+        translation_key="last_expense_cost",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:receipt-text",
+        value_fn=lambda vehicle: _last_expense_cost(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="expense_count",
+        translation_key="expense_count",
+        state_class=SensorStateClass.TOTAL,
+        icon="mdi:receipt",
+        value_fn=lambda vehicle: len(vehicle.expenses),
+    ),
+    FuelioSensorDescription(
+        key="expense_cost_this_month",
+        translation_key="expense_cost_this_month",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        icon="mdi:wallet-outline",
+        value_fn=lambda vehicle: _sum_expense_current_month(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="total_expense_cost",
+        translation_key="total_expense_cost",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
+        icon="mdi:wallet",
+        value_fn=lambda vehicle: _sum_expense_values(vehicle, "cost"),
+    ),
+    FuelioSensorDescription(
+        key="total_vehicle_cost",
+        translation_key="total_vehicle_cost",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
+        icon="mdi:car-wrench",
+        value_fn=lambda vehicle: _total_vehicle_cost(vehicle),
+    ),
+    FuelioSensorDescription(
         key="fill_count_30d",
         translation_key="fill_count_30d",
         state_class=SensorStateClass.MEASUREMENT,
@@ -489,6 +535,10 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             "total_cost",
             "cost_30d",
             "fuel_cost_this_month",
+            "last_expense_cost",
+            "expense_cost_this_month",
+            "total_expense_cost",
+            "total_vehicle_cost",
             "most_expensive_fill",
             "least_expensive_fill",
             "last_month_cost",
@@ -592,6 +642,10 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         weather_temp = _last_fill_temperature(self.vehicle)
         if weather_temp is not None:
             attrs["last_fill_temperature"] = weather_temp
+        last_expense = _last_expense(self.vehicle)
+        if last_expense is not None:
+            attrs["last_expense_title"] = last_expense.title
+            attrs["last_expense_category"] = last_expense.category_name
         attrs["data_span_days"] = _data_span_days(self.vehicle)
         attrs["partial_fill_count"] = _partial_fill_count(self.vehicle)
         attrs["full_tank_count"] = _full_tank_count(self.vehicle)
@@ -603,6 +657,8 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             attrs["worst_consumption"] = worst_consumption
         attrs["recent_fills"] = _recent_fills(self.vehicle, limit=5)
         attrs["monthly_summary"] = _monthly_summary(self.vehicle, limit=6)
+        attrs["recent_expenses"] = _recent_expenses(self.vehicle, limit=5)
+        attrs["expense_category_summary"] = _expense_category_summary(self.vehicle)
         return attrs
 
 
@@ -618,6 +674,18 @@ def _sum_record_values(vehicle: ParsedVehicle, field: str) -> float | None:
     return round(sum(values), 3)
 
 
+def _sum_expense_values(vehicle: ParsedVehicle, field: str) -> float | None:
+    """Sum numeric expense values."""
+    values = [
+        getattr(expense, field)
+        for expense in vehicle.expenses
+        if getattr(expense, field) is not None and expense.is_income is not True
+    ]
+    if not values:
+        return None
+    return round(sum(values), 3)
+
+
 def _average_price(vehicle: ParsedVehicle) -> float | None:
     """Calculate average price per liter from totals."""
     total_cost = _sum_record_values(vehicle, "cost")
@@ -625,6 +693,27 @@ def _average_price(vehicle: ParsedVehicle) -> float | None:
     if not total_cost or not total_volume:
         return None
     return round(total_cost / total_volume, 3)
+
+
+def _last_expense(vehicle: ParsedVehicle):
+    """Return the newest parsed expense if available."""
+    if not vehicle.expenses:
+        return None
+    return vehicle.expenses[-1]
+
+
+def _last_expense_date(vehicle: ParsedVehicle) -> date | None:
+    """Return the date of the newest expense."""
+    latest = _last_expense(vehicle)
+    return latest.occurred_on if latest is not None else None
+
+
+def _last_expense_cost(vehicle: ParsedVehicle) -> float | None:
+    """Return the cost of the newest expense."""
+    latest = _last_expense(vehicle)
+    if latest is None:
+        return None
+    return latest.cost
 
 
 def _average_record_values(vehicle: ParsedVehicle, field: str) -> float | None:
@@ -737,6 +826,22 @@ def _sum_cost_current_month(vehicle: ParsedVehicle) -> float | None:
     return round(sum(values), 3)
 
 
+def _sum_expense_current_month(vehicle: ParsedVehicle) -> float | None:
+    """Return the sum of non-fuel costs in the current calendar month."""
+    today = date.today()
+    values = [
+        expense.cost
+        for expense in vehicle.expenses
+        if expense.cost is not None
+        and expense.is_income is not True
+        and expense.occurred_on.year == today.year
+        and expense.occurred_on.month == today.month
+    ]
+    if not values:
+        return None
+    return round(sum(values), 3)
+
+
 def _fill_count_since_days(vehicle: ParsedVehicle, days: int) -> int:
     """Return the number of fills in a recent rolling window."""
     cutoff = date.today().toordinal() - days
@@ -839,6 +944,16 @@ def _month_over_month_cost_delta(vehicle: ParsedVehicle) -> float | None:
     if current is None or previous is None:
         return None
     return round(current - previous, 3)
+
+
+def _total_vehicle_cost(vehicle: ParsedVehicle) -> float | None:
+    """Return fuel plus non-fuel costs combined."""
+    fuel_cost = _sum_record_values(vehicle, "cost") or 0.0
+    expense_cost = _sum_expense_values(vehicle, "cost") or 0.0
+    total = fuel_cost + expense_cost
+    if total == 0:
+        return None
+    return round(total, 3)
 
 
 def _fuel_price_trend(vehicle: ParsedVehicle) -> float | None:
@@ -1055,6 +1170,45 @@ def _monthly_summary(vehicle: ParsedVehicle, limit: int = 6) -> list[dict[str, A
                 "average_price": average_price,
             }
         )
+    return result
+
+
+def _recent_expenses(vehicle: ParsedVehicle, limit: int = 5) -> list[dict[str, Any]]:
+    """Return a compact summary of the most recent non-fuel expenses."""
+    recent = list(reversed(vehicle.expenses[-limit:]))
+    rows: list[dict[str, Any]] = []
+    for expense in recent:
+        rows.append(
+            {
+                "date": expense.occurred_on.isoformat(),
+                "title": expense.title,
+                "cost": expense.cost,
+                "category_name": expense.category_name,
+                "odometer": expense.odometer,
+                "notes": expense.notes,
+            }
+        )
+    return rows
+
+
+def _expense_category_summary(vehicle: ParsedVehicle) -> list[dict[str, Any]]:
+    """Return cost totals grouped by expense category."""
+    grouped: dict[str, dict[str, Any]] = {}
+    for expense in vehicle.expenses:
+        if expense.cost is None or expense.is_income is True:
+            continue
+        key = expense.category_name or "Uncategorized"
+        summary = grouped.setdefault(
+            key,
+            {"category_name": key, "count": 0, "total_cost": 0.0},
+        )
+        summary["count"] += 1
+        summary["total_cost"] += expense.cost
+
+    result = list(grouped.values())
+    result.sort(key=lambda item: item["total_cost"], reverse=True)
+    for item in result:
+        item["total_cost"] = round(item["total_cost"], 2)
     return result
 
 

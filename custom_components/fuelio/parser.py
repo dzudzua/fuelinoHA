@@ -28,6 +28,21 @@ class FillRecord:
 
 
 @dataclass(slots=True)
+class ExpenseRecord:
+    """Normalized non-fuel cost record."""
+
+    occurred_on: date
+    title: str | None
+    odometer: float | None
+    category_id: str | None
+    category_name: str | None
+    cost: float | None
+    is_income: bool | None
+    notes: str | None
+    raw: dict[str, str]
+
+
+@dataclass(slots=True)
 class ParsedVehicle:
     """Parsed data for a single vehicle."""
 
@@ -35,6 +50,8 @@ class ParsedVehicle:
     name: str
     source_file: str
     records: list[FillRecord]
+    expenses: list[ExpenseRecord]
+    cost_categories: dict[str, str]
     currency: str | None
     fuel_unit: str | None
     distance_unit: str | None
@@ -121,11 +138,15 @@ def _parse_sectioned_fuelio_file(path: Path, text: str) -> ParsedVehicle | None:
 
     vehicle_rows = sections.get("vehicle", [])
     log_rows = sections.get("log", [])
+    cost_category_rows = sections.get("costcategories", [])
+    cost_rows = sections.get("costs", [])
     if len(vehicle_rows) < 2 or len(log_rows) < 2:
         return None
 
     vehicle_info = _row_to_dict(vehicle_rows[0], vehicle_rows[1])
     records: list[FillRecord] = []
+    cost_categories = _parse_cost_categories(cost_category_rows)
+    expenses = _parse_costs(cost_rows, cost_categories)
 
     for row in log_rows[1:]:
         log_entry = _row_to_dict(log_rows[0], row)
@@ -171,6 +192,8 @@ def _parse_sectioned_fuelio_file(path: Path, text: str) -> ParsedVehicle | None:
         name=pretty_name,
         source_file=str(path),
         records=records,
+        expenses=expenses,
+        cost_categories=cost_categories,
         currency=_clean_text(vehicle_info.get("Currency")),
         fuel_unit=FUEL_UNIT_MAP.get((vehicle_info.get("FuelUnit") or "").strip()),
         distance_unit=DISTANCE_UNIT_MAP.get((vehicle_info.get("DistUnit") or "").strip()),
@@ -250,6 +273,8 @@ def _parse_generic_csv_file(path: Path, text: str) -> ParsedVehicle | None:
         name=vehicle_name or path.stem,
         source_file=str(path),
         records=records,
+        expenses=[],
+        cost_categories={},
         currency=currency,
         fuel_unit=None,
         distance_unit=None,
@@ -423,3 +448,54 @@ def _parse_weather(value: str | None) -> dict[str, str]:
         if key:
             parsed[key] = raw_value
     return parsed
+
+
+def _parse_cost_categories(rows: list[list[str]]) -> dict[str, str]:
+    """Parse Fuelio cost categories into an id->name map."""
+    if len(rows) < 2:
+        return {}
+
+    categories: dict[str, str] = {}
+    headers = rows[0]
+    for row in rows[1:]:
+        entry = _row_to_dict(headers, row)
+        category_id = _clean_text(entry.get("CostTypeID"))
+        category_name = _clean_text(entry.get("Name"))
+        if category_id and category_name:
+            categories[category_id] = category_name
+    return categories
+
+
+def _parse_costs(
+    rows: list[list[str]], cost_categories: dict[str, str]
+) -> list[ExpenseRecord]:
+    """Parse Fuelio costs/service rows."""
+    if len(rows) < 2:
+        return []
+
+    expenses: list[ExpenseRecord] = []
+    headers = rows[0]
+    for row in rows[1:]:
+        entry = _row_to_dict(headers, row)
+        occurred_on = _parse_date(entry.get("Date"))
+        if occurred_on is None:
+            continue
+
+        category_id = _clean_text(entry.get("CostTypeID"))
+        expense = ExpenseRecord(
+            occurred_on=occurred_on,
+            title=_clean_text(entry.get("CostTitle")),
+            odometer=_parse_number(entry.get("Odo")),
+            category_id=category_id,
+            category_name=cost_categories.get(category_id or ""),
+            cost=_parse_number(entry.get("Cost")),
+            is_income=_parse_bool(entry.get("isIncome")),
+            notes=_clean_text(entry.get("Notes")),
+            raw=entry,
+        )
+        if expense.cost is None and expense.title is None:
+            continue
+        expenses.append(expense)
+
+    expenses.sort(key=lambda item: item.occurred_on)
+    return expenses

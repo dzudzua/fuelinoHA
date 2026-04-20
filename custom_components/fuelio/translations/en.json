@@ -99,6 +99,24 @@
       "fuel_cost_this_month": {
         "name": "Fuel cost this month"
       },
+      "last_expense_date": {
+        "name": "Last expense date"
+      },
+      "last_expense_cost": {
+        "name": "Last expense cost"
+      },
+      "expense_count": {
+        "name": "Expense count"
+      },
+      "expense_cost_this_month": {
+        "name": "Expense cost this month"
+      },
+      "total_expense_cost": {
+        "name": "Total expense cost"
+      },
+      "total_vehicle_cost": {
+        "name": "Total vehicle cost"
+      },
       "fill_count_30d": {
         "name": "Fill count 30 days"
       },

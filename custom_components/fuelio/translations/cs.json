@@ -99,6 +99,24 @@
       "fuel_cost_this_month": {
         "name": "Náklady tento měsíc"
       },
+      "last_expense_date": {
+        "name": "Datum posledního výdaje"
+      },
+      "last_expense_cost": {
+        "name": "Cena posledního výdaje"
+      },
+      "expense_count": {
+        "name": "Počet výdajů"
+      },
+      "expense_cost_this_month": {
+        "name": "Výdaje tento měsíc"
+      },
+      "total_expense_cost": {
+        "name": "Celkové ostatní výdaje"
+      },
+      "total_vehicle_cost": {
+        "name": "Celkové náklady auta"
+      },
       "fill_count_30d": {
         "name": "Počet tankování za 30 dní"
       },

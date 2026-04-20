@@ -66,6 +66,15 @@ class FuelioParserTests(unittest.TestCase):
         """The parser should read all log rows from the sample export."""
         self.assertEqual(len(self.parsed.records), 2)
 
+    def test_expense_sections_are_parsed(self) -> None:
+        """Fuelio cost/category sections should become expense records."""
+        self.assertEqual(len(self.parsed.expenses), 2)
+        latest_expense = self.parsed.expenses[-1]
+        self.assertEqual(str(latest_expense.occurred_on), "2026-03-24")
+        self.assertEqual(latest_expense.title, "Wax wash")
+        self.assertEqual(latest_expense.category_name, "Car wash")
+        self.assertEqual(latest_expense.cost, 299.0)
+
 
 if __name__ == "__main__":
     unittest.main()
