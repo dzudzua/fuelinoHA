@@ -4,7 +4,7 @@ Custom Home Assistant integration for importing Fuelio backup CSV files.
 
 ## Version
 
-Current integration version: `0.6.0`
+Current integration version: `0.6.1`
 
 ## Installation
 
@@ -102,6 +102,7 @@ Do not commit your real Fuelio exports to a public repository. Keep personal CSV
 
 ## Changelog
 
+- `0.6.1`: added Czech translations and a richer dashboard example for the new analytics
 - `0.6.0`: added advanced fuel analytics for consumption, fill cadence, monthly comparisons, price trends, and location/station summaries
 - `0.5.3`: added missing HACS-friendly issue tracker metadata to the integration manifest
 - `0.5.2`: made the upload-help notification include a clickable upload link

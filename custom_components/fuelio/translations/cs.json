@@ -1,0 +1,188 @@
+{
+  "title": "Fuelio",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Import Fuelio CSV",
+        "description": "Importuj záložní CSV z Fuelio z lokálního souboru nebo složky. Cestu můžeš připravit už teď a CSV doplnit později.",
+        "data": {
+          "source_path": "Cesta k CSV souboru nebo složce",
+          "scan_interval": "Interval kontroly (minuty)"
+        }
+      },
+      "reconfigure": {
+        "title": "Přenastavit Fuelio",
+        "data": {
+          "source_path": "Cesta k CSV souboru nebo složce",
+          "scan_interval": "Interval kontroly (minuty)"
+        }
+      }
+    },
+    "error": {
+      "invalid_source_path": "Cesta ke zdroji nesmí být prázdná."
+    },
+    "abort": {
+      "already_configured": "Tato cesta už je nakonfigurovaná.",
+      "reconfigured": "Konfigurace byla upravena."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Možnosti Fuelio",
+        "data": {
+          "source_path": "Cesta k CSV souboru nebo složce",
+          "scan_interval": "Interval kontroly (minuty)"
+        }
+      }
+    },
+    "error": {}
+  },
+  "entity": {
+    "button": {
+      "open_upload_page": {
+        "name": "Otevřít nahrání CSV"
+      },
+      "reload_data": {
+        "name": "Obnovit data"
+      }
+    },
+    "sensor": {
+      "last_fill_date": {
+        "name": "Datum posledního tankování"
+      },
+      "days_since_fill": {
+        "name": "Dnů od tankování"
+      },
+      "last_fill_volume": {
+        "name": "Poslední objem tankování"
+      },
+      "last_fill_cost": {
+        "name": "Cena posledního tankování"
+      },
+      "last_price_per_unit": {
+        "name": "Poslední cena za jednotku"
+      },
+      "last_consumption": {
+        "name": "Poslední spotřeba"
+      },
+      "last_fill_temperature": {
+        "name": "Teplota při posledním tankování"
+      },
+      "last_city": {
+        "name": "Poslední město"
+      },
+      "favorite_station": {
+        "name": "Nejčastější pumpa"
+      },
+      "favorite_city": {
+        "name": "Nejčastější město"
+      },
+      "favorite_station_id": {
+        "name": "Nejčastější ID pumpy"
+      },
+      "odometer": {
+        "name": "Tachometr"
+      },
+      "distance_since_previous_fill": {
+        "name": "Vzdálenost od minulého tankování"
+      },
+      "tracked_distance": {
+        "name": "Sledovaná vzdálenost"
+      },
+      "fill_count": {
+        "name": "Počet tankování"
+      },
+      "cost_30d": {
+        "name": "Náklady za 30 dní"
+      },
+      "fuel_cost_this_month": {
+        "name": "Náklady tento měsíc"
+      },
+      "fill_count_30d": {
+        "name": "Počet tankování za 30 dní"
+      },
+      "total_cost": {
+        "name": "Celkové náklady"
+      },
+      "most_expensive_fill": {
+        "name": "Nejdražší tankování"
+      },
+      "least_expensive_fill": {
+        "name": "Nejlevnější tankování"
+      },
+      "total_volume": {
+        "name": "Celkový objem"
+      },
+      "average_price": {
+        "name": "Průměrná cena"
+      },
+      "average_price_5_fills": {
+        "name": "Průměrná cena za posledních 5 tankování"
+      },
+      "average_consumption": {
+        "name": "Průměrná spotřeba"
+      },
+      "best_consumption": {
+        "name": "Nejlepší spotřeba"
+      },
+      "worst_consumption": {
+        "name": "Nejhorší spotřeba"
+      },
+      "average_consumption_30d": {
+        "name": "Průměrná spotřeba za 30 dní"
+      },
+      "average_cost_per_km": {
+        "name": "Průměrná cena na vzdálenost"
+      },
+      "average_fill_volume": {
+        "name": "Průměrný objem tankování"
+      },
+      "average_days_between_fills": {
+        "name": "Průměr dnů mezi tankováními"
+      },
+      "average_distance_between_fills": {
+        "name": "Průměrná vzdálenost mezi tankováními"
+      },
+      "distance_this_month": {
+        "name": "Vzdálenost tento měsíc"
+      },
+      "last_month_cost": {
+        "name": "Náklady minulý měsíc"
+      },
+      "last_month_average_consumption": {
+        "name": "Průměrná spotřeba minulý měsíc"
+      },
+      "last_month_fill_count": {
+        "name": "Počet tankování minulý měsíc"
+      },
+      "last_month_average_price": {
+        "name": "Průměrná cena minulý měsíc"
+      },
+      "month_over_month_cost_delta": {
+        "name": "Rozdíl nákladů proti minulému měsíci"
+      },
+      "fuel_price_trend": {
+        "name": "Trend ceny paliva"
+      },
+      "days_since_full_tank": {
+        "name": "Dnů od plné nádrže"
+      },
+      "km_since_full_tank": {
+        "name": "Kilometrů od plné nádrže"
+      },
+      "lowest_price_per_unit": {
+        "name": "Nejnižší cena za jednotku"
+      },
+      "highest_price_per_unit": {
+        "name": "Nejvyšší cena za jednotku"
+      },
+      "different_stations_count": {
+        "name": "Počet různých pump"
+      },
+      "different_cities_count": {
+        "name": "Počet různých měst"
+      }
+    }
+  }
+}
