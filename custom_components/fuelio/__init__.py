@@ -10,6 +10,7 @@ from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 
 from .const import DEFAULT_UPLOAD_FOLDER, DOMAIN, PANEL_URL_PATH, PLATFORMS
 
@@ -29,6 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     coordinator = FuelioDataUpdateCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
+    _remove_orphan_sensor_registry_entries(hass, entry)
 
     entry.runtime_data = coordinator
     hass.data[DOMAIN][entry.entry_id] = coordinator
@@ -233,3 +235,25 @@ def _save_uploaded_csv(upload_folder: str, filename: str, file_bytes: bytes) -> 
     destination = folder_path / filename
     destination.write_bytes(file_bytes)
     return str(destination)
+
+
+def _remove_orphan_sensor_registry_entries(
+    hass: HomeAssistant, entry: ConfigEntry
+) -> None:
+    """Remove Fuelio sensor registry entries that lost their device binding.
+
+    Home Assistant reads device info when an entity is added. If older FuelinoHA
+    versions created sensor registry entries without a bound device, those stale
+    entries can remain detached even after newer code is deployed. Removing only
+    the orphaned sensor registry entries lets Home Assistant recreate them on the
+    next platform setup with correct device binding.
+    """
+    registry = er.async_get(hass)
+    for entity_entry in er.async_entries_for_config_entry(registry, entry.entry_id):
+        if entity_entry.domain != "sensor":
+            continue
+        if entity_entry.platform != DOMAIN:
+            continue
+        if entity_entry.device_id is not None:
+            continue
+        registry.async_remove(entity_entry.entity_id)
