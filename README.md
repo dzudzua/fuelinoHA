@@ -8,7 +8,7 @@ FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV fil
 
 ## Version
 
-Current integration version: `0.10.9`
+Current integration version: `0.10.10`
 
 ## What Fuelino supports
 
@@ -122,6 +122,7 @@ python tools\inspect_fuelio_export.py hjundaj-1-2026-04-19_12-09.csv
 
 ## Changelog
 
+- `0.10.10`: polished entity naming, day units, pricing icons, and temperature unit handling so FuelinoHA feels more native in Home Assistant
 - `0.10.9`: broadened orphan Fuelino sensor cleanup so stale detached entities from older installs are removed before Home Assistant recreates them
 - `0.10.8`: automatically removes old orphaned Fuelino sensor registry entries so Home Assistant recreates them attached to the vehicle device
 - `0.10.7`: fixed sensor device binding so Fuelino vehicle entities attach to the vehicle device again in Home Assistant

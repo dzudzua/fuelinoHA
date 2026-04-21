@@ -16,7 +16,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfLength
+from homeassistant.const import UnitOfLength, UnitOfTemperature, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -45,7 +45,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         key="days_since_fill",
         translation_key="days_since_fill",
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement="d",
+        native_unit_of_measurement=UnitOfTime.DAYS,
         icon="mdi:calendar-clock",
         value_fn=lambda vehicle: (date.today() - vehicle.records[-1].occurred_on).days,
     ),
@@ -71,7 +71,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="last_price_per_unit",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=3,
-        icon="mdi:currency-usd",
+        icon="mdi:cash-100",
         value_fn=lambda vehicle: vehicle.records[-1].price_per_unit,
     ),
     FuelioSensorDescription(
@@ -392,7 +392,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="average_cost_per_km",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=3,
-        icon="mdi:currency-sign",
+        icon="mdi:cash-fast",
         value_fn=lambda vehicle: _average_cost_per_km(vehicle),
     ),
     FuelioSensorDescription(
@@ -408,7 +408,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         key="average_days_between_fills",
         translation_key="average_days_between_fills",
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement="d",
+        native_unit_of_measurement=UnitOfTime.DAYS,
         icon="mdi:calendar-sync",
         value_fn=lambda vehicle: _average_days_between_fills(vehicle),
     ),
@@ -460,7 +460,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         translation_key="last_month_average_price",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=3,
-        icon="mdi:currency-eur",
+        icon="mdi:cash-clock",
         value_fn=lambda vehicle: _average_record_values_for_month(
             vehicle, "price_per_unit", previous_month=True
         ),
@@ -485,7 +485,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         key="days_since_full_tank",
         translation_key="days_since_full_tank",
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement="d",
+        native_unit_of_measurement=UnitOfTime.DAYS,
         icon="mdi:calendar-refresh",
         value_fn=lambda vehicle: _days_since_full_tank(vehicle),
     ),
@@ -639,11 +639,6 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         return self.coordinator.data.vehicles[self._vehicle_key]
 
     @property
-    def name(self) -> str | None:
-        """Return entity name."""
-        return self.entity_description.translation_key.replace("_", " ").title()
-
-    @property
     def native_value(self) -> date | Decimal | float | int | None:
         """Return the current native value."""
         return self.entity_description.value_fn(self.vehicle)
@@ -656,6 +651,8 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
     @property
     def suggested_unit_of_measurement(self) -> str | None:
         """Return per-vehicle currency when relevant."""
+        if self.entity_description.key == "last_fill_temperature":
+            return UnitOfTemperature.CELSIUS
         if self.entity_description.key in {
             "last_fill_cost",
             "total_cost",
