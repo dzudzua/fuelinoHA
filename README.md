@@ -20,7 +20,7 @@ FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV fil
 
 ## Version
 
-Current integration version: `0.10.11`
+Current integration version: `0.10.12`
 
 ## What Fuelino supports
 
@@ -140,6 +140,7 @@ python tools\inspect_fuelio_export.py hjundaj-1-2026-04-19_12-09.csv
 
 ## Changelog
 
+- `0.10.12`: consumption sensors now fall back to a derived volume-vs-odometer calculation when Fuelio exports do not include explicit consumption values, so average and recent consumption stats stay visible
 - `0.10.11`: improved Dropbox setup guidance with a direct file-link example and validation that catches Dropbox folder links before setup completes
 - `0.10.10`: polished entity naming, day units, pricing icons, and temperature unit handling so FuelinoHA feels more native in Home Assistant
 - `0.10.9`: broadened orphan Fuelino sensor cleanup so stale detached entities from older installs are removed before Home Assistant recreates them

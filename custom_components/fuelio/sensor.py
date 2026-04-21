@@ -80,7 +80,7 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
         icon="mdi:chart-bell-curve-cumulative",
-        value_fn=lambda vehicle: vehicle.records[-1].consumption,
+        value_fn=lambda vehicle: _last_record_value(vehicle, "consumption"),
     ),
     FuelioSensorDescription(
         key="last_fill_temperature",
@@ -974,13 +974,78 @@ def _last_trip_cost(vehicle: ParsedVehicle) -> float | None:
     return latest.trip_cost
 
 
+def _last_record_value(vehicle: ParsedVehicle, field: str) -> float | None:
+    """Return the latest explicit or derived record value."""
+    if not vehicle.records:
+        return None
+    record = vehicle.records[-1]
+    value = getattr(record, field)
+    if value is None and field == "consumption":
+        previous = vehicle.records[-2] if len(vehicle.records) > 1 else None
+        value = _derived_consumption(record, previous)
+    return value
+
+
+def _derived_consumption(record: Any, previous: Any) -> float | None:
+    """Estimate consumption from fill volume and odometer delta when explicit data is missing."""
+    if previous is None:
+        return None
+    if record.is_partial is True or previous.is_partial is True:
+        return None
+    if record.volume is None or record.odometer is None or previous.odometer is None:
+        return None
+    distance = record.odometer - previous.odometer
+    if distance <= 0:
+        return None
+    return round((record.volume / distance) * 100, 3)
+
+
+def _record_field_values(vehicle: ParsedVehicle, field: str) -> list[float]:
+    """Return explicit or derived record values for a field."""
+    if field != "consumption":
+        return [
+            getattr(record, field)
+            for record in vehicle.records
+            if getattr(record, field) is not None
+        ]
+
+    values: list[float] = []
+    previous = None
+    for record in vehicle.records:
+        value = record.consumption
+        if value is None:
+            value = _derived_consumption(record, previous)
+        if value is not None:
+            values.append(value)
+        previous = record
+    return values
+
+
+def _record_field_values_recent(vehicle: ParsedVehicle, field: str, limit: int) -> list[float]:
+    """Return the most recent explicit or derived record values for a field."""
+    if field != "consumption":
+        values = [
+            getattr(record, field)
+            for record in vehicle.records[-limit:]
+            if getattr(record, field) is not None
+        ]
+        return values
+
+    values: list[float] = []
+    for index in range(max(0, len(vehicle.records) - limit), len(vehicle.records)):
+        record = vehicle.records[index]
+        previous = vehicle.records[index - 1] if index > 0 else None
+        value = record.consumption
+        if value is None:
+            value = _derived_consumption(record, previous)
+        if value is not None:
+            values.append(value)
+    return values
+
+
 def _average_record_values(vehicle: ParsedVehicle, field: str) -> float | None:
     """Calculate an average across available record values."""
-    values = [
-        getattr(record, field)
-        for record in vehicle.records
-        if getattr(record, field) is not None
-    ]
+    values = _record_field_values(vehicle, field)
     if not values:
         return None
     return round(sum(values) / len(values), 3)
@@ -990,11 +1055,7 @@ def _average_recent_record_values(
     vehicle: ParsedVehicle, field: str, limit: int
 ) -> float | None:
     """Calculate an average across the most recent record values."""
-    values = [
-        getattr(record, field)
-        for record in vehicle.records[-limit:]
-        if getattr(record, field) is not None
-    ]
+    values = _record_field_values_recent(vehicle, field, limit)
     if not values:
         return None
     return round(sum(values) / len(values), 3)
@@ -1005,11 +1066,16 @@ def _average_record_values_since_days(
 ) -> float | None:
     """Calculate an average across recent available record values."""
     cutoff = date.today().toordinal() - days
-    values = [
-        getattr(record, field)
-        for record in vehicle.records
-        if record.occurred_on.toordinal() >= cutoff and getattr(record, field) is not None
-    ]
+    values: list[float] = []
+    for index, record in enumerate(vehicle.records):
+        if record.occurred_on.toordinal() < cutoff:
+            continue
+        value = getattr(record, field)
+        if value is None and field == "consumption":
+            previous = vehicle.records[index - 1] if index > 0 else None
+            value = _derived_consumption(record, previous)
+        if value is not None:
+            values.append(value)
     if not values:
         return None
     return round(sum(values) / len(values), 3)
@@ -1020,13 +1086,16 @@ def _average_record_values_for_month(
 ) -> float | None:
     """Calculate an average across a calendar month."""
     year, month = _month_key(previous_month=previous_month)
-    values = [
-        getattr(record, field)
-        for record in vehicle.records
-        if record.occurred_on.year == year
-        and record.occurred_on.month == month
-        and getattr(record, field) is not None
-    ]
+    values: list[float] = []
+    for index, record in enumerate(vehicle.records):
+        if record.occurred_on.year != year or record.occurred_on.month != month:
+            continue
+        value = getattr(record, field)
+        if value is None and field == "consumption":
+            previous = vehicle.records[index - 1] if index > 0 else None
+            value = _derived_consumption(record, previous)
+        if value is not None:
+            values.append(value)
     if not values:
         return None
     return round(sum(values) / len(values), 3)
@@ -1342,11 +1411,7 @@ def _last_fill_temperature(vehicle: ParsedVehicle) -> float | None:
 
 def _extreme_record_value(vehicle: ParsedVehicle, field: str, reducer) -> float | None:
     """Return an extreme value across records for a numeric field."""
-    values = [
-        getattr(record, field)
-        for record in vehicle.records
-        if getattr(record, field) is not None
-    ]
+    values = _record_field_values(vehicle, field)
     if not values:
         return None
     return round(reducer(values), 3)
@@ -1356,7 +1421,12 @@ def _recent_fills(vehicle: ParsedVehicle, limit: int = 5) -> list[dict[str, Any]
     """Return a compact summary of the most recent fills."""
     recent = list(reversed(vehicle.records[-limit:]))
     rows: list[dict[str, Any]] = []
-    for record in recent:
+    for reverse_index, record in enumerate(recent):
+        original_index = len(vehicle.records) - 1 - reverse_index
+        previous = vehicle.records[original_index - 1] if original_index > 0 else None
+        consumption = record.consumption
+        if consumption is None:
+            consumption = _derived_consumption(record, previous)
         rows.append(
             {
                 "date": record.occurred_on.isoformat(),
@@ -1364,7 +1434,7 @@ def _recent_fills(vehicle: ParsedVehicle, limit: int = 5) -> list[dict[str, Any]
                 "volume": record.volume,
                 "cost": record.cost,
                 "price_per_unit": record.price_per_unit,
-                "consumption": record.consumption,
+                "consumption": consumption,
                 "city": record.city,
                 "station_id": record.station_id,
                 "fuel_type": record.fuel_type,
