@@ -23,7 +23,7 @@ def _user_schema(
     default_path: str = "",
     default_url: str = "",
     default_scan_interval: int = DEFAULT_SCAN_INTERVAL,
-) -> vol.Schema:
+    ) -> vol.Schema:
     """Return the single-step setup schema."""
     return vol.Schema(
         {
@@ -52,6 +52,16 @@ def _user_schema(
     )
 
 
+def _remote_url_error(remote_url: str) -> str | None:
+    """Return a validation error key for remote CSV URLs."""
+    normalized = remote_url.strip().lower()
+    if not normalized.startswith(("http://", "https://")):
+        return "invalid_remote_url"
+    if "dropbox.com" in normalized and ("/scl/fo/" in normalized or "/home/" in normalized):
+        return "dropbox_folder_link"
+    return None
+
+
 class FuelioConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Fuelio."""
 
@@ -71,7 +81,8 @@ class FuelioConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         source_path = user_input.get(CONF_SOURCE_PATH, "").strip()
 
         if source_type == SOURCE_TYPE_REMOTE_URL:
-            if not remote_url or not remote_url.lower().startswith(("http://", "https://")):
+            remote_error = _remote_url_error(remote_url) if remote_url else "invalid_remote_url"
+            if remote_error is not None:
                 return self.async_show_form(
                     step_id="user",
                     data_schema=_user_schema(
@@ -80,7 +91,7 @@ class FuelioConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         default_url=remote_url,
                         default_scan_interval=scan_interval,
                     ),
-                    errors={"base": "invalid_remote_url"},
+                    errors={"base": remote_error},
                 )
 
             await self.async_set_unique_id(remote_url.lower())

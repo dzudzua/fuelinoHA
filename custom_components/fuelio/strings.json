@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Fuelio CSV import",
-        "description": "Use a local path or Dropbox URL. Upload from computer: `/fuelio-upload`. After setup, use the upload helper button.",
+        "description": "Use a local path or a direct CSV link. Upload from computer: `/fuelio-upload`. For Dropbox, paste a shared file link such as `https://www.dropbox.com/scl/fi/.../vehicle-1-sync.csv?dl=0`.",
         "data": {
           "source_type": "Source type",
           "source_path": "CSV file or folder path",
@@ -38,7 +38,8 @@
     },
     "error": {
       "invalid_source_path": "The source path cannot be empty.",
-      "invalid_remote_url": "The remote CSV URL must start with http:// or https://."
+      "invalid_remote_url": "The remote CSV URL must start with http:// or https://.",
+      "dropbox_folder_link": "This looks like a Dropbox folder link. Open the folder, share one CSV file, and paste that file link here."
     },
     "abort": {
       "already_configured": "This path is already configured.",
