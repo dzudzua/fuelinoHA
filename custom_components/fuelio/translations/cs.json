@@ -4,9 +4,12 @@
     "step": {
       "user": {
         "title": "Import Fuelio CSV",
-        "description": "Vyber, jestli má Fuelino načítat CSV z lokálního souboru nebo složky, nebo ze vzdáleného CSV odkazu, například sdíleného Dropbox odkazu na soubor.",
+        "description": "Vyber typ zdroje a pak v tomto jednom formuláři vyplň buď lokální cestu k CSV, nebo Dropbox / vzdálený CSV odkaz.",
         "data": {
-          "source_type": "Typ zdroje"
+          "source_type": "Typ zdroje",
+          "source_path": "Cesta k CSV souboru nebo složce",
+          "remote_csv_url": "Dropbox / vzdálený CSV odkaz",
+          "scan_interval": "Interval kontroly (minuty)"
         }
       },
       "local": {

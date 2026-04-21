@@ -4,9 +4,12 @@
     "step": {
       "user": {
         "title": "Fuelio CSV import",
-        "description": "Choose whether Fuelio should read CSV data from a local file/folder or from a remote CSV URL such as a Dropbox shared file link.",
+        "description": "Choose the source type and then fill either a local CSV path or a Dropbox / remote CSV URL in this single setup form.",
         "data": {
-          "source_type": "Source type"
+          "source_type": "Source type",
+          "source_path": "CSV file or folder path",
+          "remote_csv_url": "Dropbox / remote CSV URL",
+          "scan_interval": "Scan interval (minutes)"
         }
       },
       "local": {
