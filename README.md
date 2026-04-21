@@ -112,6 +112,12 @@ This is best when Fuelio keeps updating the same file name.
 Do not commit your real Fuelio exports to a public repository.
 Keep personal CSV backups out of git and only point Home Assistant to local files stored inside your HA config.
 
+## Support
+
+If Fuelino helps you, you can support development here:
+
+[![Buy Me a Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://www.buymeacoffee.com/dzudzua)
+
 ## Tests
 
 ```powershell
