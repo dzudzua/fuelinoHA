@@ -4,9 +4,24 @@
     "step": {
       "user": {
         "title": "Import Fuelio CSV",
+        "description": "Vyber, jestli má Fuelino načítat CSV z lokálního souboru nebo složky, nebo ze vzdáleného CSV odkazu, například sdíleného Dropbox odkazu na soubor.",
+        "data": {
+          "source_type": "Typ zdroje"
+        }
+      },
+      "local": {
+        "title": "Lokální import Fuelio CSV",
         "description": "Importuj záložní CSV z Fuelio z lokálního souboru nebo složky. Cestu můžeš připravit už teď a CSV doplnit později.",
         "data": {
           "source_path": "Cesta k CSV souboru nebo složce",
+          "scan_interval": "Interval kontroly (minuty)"
+        }
+      },
+      "remote": {
+        "title": "Vzdálený import Fuelio CSV",
+        "description": "Vlož přímý CSV odkaz, například sdílený Dropbox link na soubor. Dropbox odkazy se automaticky upraví na přímé stažení.",
+        "data": {
+          "remote_csv_url": "Dropbox / vzdálený CSV odkaz",
           "scan_interval": "Interval kontroly (minuty)"
         }
       },
@@ -19,7 +34,8 @@
       }
     },
     "error": {
-      "invalid_source_path": "Cesta ke zdroji nesmí být prázdná."
+      "invalid_source_path": "Cesta ke zdroji nesmí být prázdná.",
+      "invalid_remote_url": "Vzdálený CSV odkaz musí začínat na http:// nebo https://."
     },
     "abort": {
       "already_configured": "Tato cesta už je nakonfigurovaná.",
@@ -97,7 +113,7 @@
         "name": "Náklady za 30 dní"
       },
       "fuel_cost_this_month": {
-        "name": "Náklady tento měsíc"
+        "name": "Náklady na palivo tento měsíc"
       },
       "last_expense_date": {
         "name": "Datum posledního výdaje"
@@ -150,12 +166,6 @@
       "total_cost": {
         "name": "Celkové náklady"
       },
-      "most_expensive_fill": {
-        "name": "Nejdražší tankování"
-      },
-      "least_expensive_fill": {
-        "name": "Nejlevnější tankování"
-      },
       "total_volume": {
         "name": "Celkový objem"
       },
@@ -178,7 +188,7 @@
         "name": "Průměrná spotřeba za 30 dní"
       },
       "average_cost_per_km": {
-        "name": "Průměrná cena na vzdálenost"
+        "name": "Průměrná cena za vzdálenost"
       },
       "average_fill_volume": {
         "name": "Průměrný objem tankování"
@@ -214,13 +224,19 @@
         "name": "Dnů od plné nádrže"
       },
       "km_since_full_tank": {
-        "name": "Kilometrů od plné nádrže"
+        "name": "Vzdálenost od plné nádrže"
       },
       "lowest_price_per_unit": {
         "name": "Nejnižší cena za jednotku"
       },
       "highest_price_per_unit": {
         "name": "Nejvyšší cena za jednotku"
+      },
+      "most_expensive_fill": {
+        "name": "Nejdražší tankování"
+      },
+      "least_expensive_fill": {
+        "name": "Nejlevnější tankování"
       },
       "different_stations_count": {
         "name": "Počet různých pump"
@@ -244,7 +260,7 @@
         "name": "Celková vzdálenost jízd"
       },
       "average_trip_cost_per_km": {
-        "name": "Průměrná cena jízdy na vzdálenost"
+        "name": "Průměrná cena jízdy za vzdálenost"
       }
     }
   }
