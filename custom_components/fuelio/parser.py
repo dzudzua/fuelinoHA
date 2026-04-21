@@ -126,8 +126,16 @@ DISTANCE_UNIT_MAP = {
 def parse_vehicle_file(path: Path) -> ParsedVehicle | None:
     """Parse a single Fuelio CSV file."""
     text = path.read_text(encoding="utf-8-sig", errors="ignore")
+    return parse_vehicle_text(path, text)
+
+
+def parse_vehicle_text(source: Path | str, text: str) -> ParsedVehicle | None:
+    """Parse Fuelio CSV text from a file-like source."""
     if not text.strip():
         return None
+
+    source_name = str(source)
+    path = Path(source_name)
 
     if "## Vehicle" in text and "## Log" in text:
         parsed = _parse_sectioned_fuelio_file(path, text)

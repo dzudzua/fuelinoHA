@@ -6,11 +6,12 @@ FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV fil
 
 ## Version
 
-Current integration version: `0.9.4`
+Current integration version: `0.10.0`
 
 ## What Fuelino supports
 
 - Fuelio CSV import from a local file or folder
+- Fuelio CSV import from a Dropbox / remote CSV URL
 - automatic vehicle discovery from Fuelio exports
 - fuel statistics and driving analytics
 - city, station, weather and history insights
@@ -31,10 +32,11 @@ Recommended workflow:
 
 1. Put your Fuelio export into Home Assistant storage, for example `/config/fuelino/`
 2. Add the `Fuelio` integration from the Home Assistant UI
-3. Set the source path to either:
-   - one CSV file
-   - or a folder like `/config/fuelino`
-4. If using a folder, Fuelino will prefer the newest CSV per vehicle
+3. Choose a source type:
+   - local CSV file or folder
+   - Dropbox / remote CSV URL
+4. If using a local folder, Fuelino will prefer the newest CSV per vehicle
+5. If using Dropbox, prefer a stable shared file link to one CSV such as `vehicle-1-sync.csv`
 
 If you keep replacing the same export or keep uploading newer CSV files into the folder, Fuelino will refresh on the configured scan interval.
 
@@ -81,6 +83,7 @@ Fuelino can read either:
 
 - one specific CSV file
 - one folder containing Fuelio CSV exports
+- one remote CSV URL, for example a Dropbox shared file link
 
 When a folder is configured, it scans:
 
@@ -88,6 +91,19 @@ When a folder is configured, it scans:
 - `*.csv`
 
 Each CSV file is treated as one vehicle dataset unless a recognizable vehicle name is present in the file.
+
+## Dropbox links
+
+FuelinoHA supports a remote CSV URL mode intended for simple Dropbox-based setups.
+
+Recommended approach:
+
+1. Open your Fuelio Dropbox backup folder
+2. Share one concrete CSV file, for example `vehicle-1-sync.csv`
+3. Paste that shared link into the integration
+4. Fuelino will normalize Dropbox file links for direct download automatically
+
+This is best when Fuelio keeps updating the same file name.
 
 ## Privacy
 
@@ -104,6 +120,7 @@ python tools\inspect_fuelio_export.py hjundaj-1-2026-04-19_12-09.csv
 
 ## Changelog
 
+- `0.10.0`: added a new source-type setup flow with Dropbox / remote CSV URL support
 - `0.9.4`: added category-specific expense totals for service, wash, registration, parking, tolls, and insurance
 - `0.9.3`: added a local export-inspection tool alongside diagnostics and real-export validation
 - `0.9.2`: added diagnostics support for config-entry troubleshooting and release validation

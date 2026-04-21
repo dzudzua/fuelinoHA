@@ -4,9 +4,24 @@
     "step": {
       "user": {
         "title": "Fuelio CSV import",
+        "description": "Choose whether Fuelio should read CSV data from a local file/folder or from a remote CSV URL such as a Dropbox shared file link.",
+        "data": {
+          "source_type": "Source type"
+        }
+      },
+      "local": {
+        "title": "Fuelio local CSV import",
         "description": "Import Fuelio backup CSV data from a local CSV file or folder. The path can be prepared now and the CSV added later.",
         "data": {
           "source_path": "CSV file or folder path",
+          "scan_interval": "Scan interval (minutes)"
+        }
+      },
+      "remote": {
+        "title": "Fuelio remote CSV import",
+        "description": "Paste a direct CSV link, for example a Dropbox shared file URL. Dropbox links are automatically normalized for direct download.",
+        "data": {
+          "remote_csv_url": "Dropbox / remote CSV URL",
           "scan_interval": "Scan interval (minutes)"
         }
       },
@@ -19,7 +34,8 @@
       }
     },
     "error": {
-      "invalid_source_path": "The source path cannot be empty."
+      "invalid_source_path": "The source path cannot be empty.",
+      "invalid_remote_url": "The remote CSV URL must start with http:// or https://."
     },
     "abort": {
       "already_configured": "This path is already configured.",

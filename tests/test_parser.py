@@ -85,6 +85,17 @@ class FuelioParserTests(unittest.TestCase):
         self.assertAlmostEqual(latest_trip.distance_km, 95.114, places=3)
         self.assertAlmostEqual(latest_trip.trip_cost, 462.04438, places=5)
 
+    def test_parse_vehicle_text_matches_file_parser(self) -> None:
+        """Parsing raw CSV text should match file-based parsing."""
+        text = SAMPLE_EXPORT.read_text(encoding="utf-8")
+        parsed = self.parser.parse_vehicle_text("dropbox://vehicle-1-sync.csv", text)
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed.name, self.parsed.name)
+        self.assertEqual(parsed.key, self.parsed.key)
+        self.assertEqual(len(parsed.records), len(self.parsed.records))
+        self.assertEqual(len(parsed.expenses), len(self.parsed.expenses))
+        self.assertEqual(len(parsed.trips), len(self.parsed.trips))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -61,7 +61,11 @@ async def async_get_config_entry_diagnostics(
             "data": dict(entry.data),
             "options": dict(entry.options),
         },
-        "resolved_source_path": str(coordinator.source_path),
+        "source_type": coordinator.source_type,
+        "resolved_source_path": (
+            str(coordinator.source_path) if coordinator.source_path is not None else None
+        ),
+        "remote_csv_url": coordinator.remote_csv_url,
         "source_files": coordinator.data.source_files,
         "vehicle_count": len(coordinator.data.vehicles),
         "vehicles": vehicles,

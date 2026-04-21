@@ -94,14 +94,14 @@ class FuelioButton(CoordinatorEntity[FuelioDataUpdateCoordinator], ButtonEntity)
             upload_url = f"{base_url}{upload_path}"
         except NoURLAvailableError:
             upload_url = upload_path
-        source_path = self.coordinator.source_path
+        source_path = self.coordinator.source_label
         message = (
             "Open the Fuelio upload page and upload a CSV export.\n\n"
             f"[Open Fuelio upload page]({upload_url})\n\n"
             f"Upload page: `{upload_url}`\n"
-            f"Configured source path: `{source_path}`\n\n"
-            "Recommended workflow: set Fuelio to a folder path and let the "
-            "integration use the newest CSV file in that folder."
+            f"Configured source: `{source_path}`\n\n"
+            "Recommended workflow: use a local folder for manual uploads or a "
+            "stable Dropbox shared file link for remote CSV mode."
         )
         async_create(
             self.hass,
