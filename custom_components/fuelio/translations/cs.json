@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Import Fuelio CSV",
-        "description": "Vyber typ zdroje a pak v tomto jednom formuláři vyplň buď lokální cestu k CSV, nebo Dropbox / vzdálený CSV odkaz.\n\n[Otevřít stránku pro upload](/api/fuelio/upload-page)",
+        "description": "Vyber typ zdroje a pak v tomto jednom formuláři vyplň odpovídající pole.\n\nPro nahrání CSV z počítače otevři `/fuelio-upload`.\nPro Dropbox vlož sdílený odkaz na CSV soubor.\nPro lokální režim zadej cestu k souboru nebo složce v Home Assistantu.",
         "data": {
           "source_type": "Typ zdroje",
           "source_path": "Cesta k CSV souboru nebo složce",

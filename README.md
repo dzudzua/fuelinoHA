@@ -8,7 +8,7 @@ FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV fil
 
 ## Version
 
-Current integration version: `0.10.3`
+Current integration version: `0.10.4`
 
 ## What Fuelino supports
 
@@ -122,6 +122,7 @@ python tools\inspect_fuelio_export.py hjundaj-1-2026-04-19_12-09.csv
 
 ## Changelog
 
+- `0.10.4`: replaced the setup-form link with a direct written upload/local/Dropbox usage guide
 - `0.10.3`: added a direct upload-page link into the integration setup form
 - `0.10.2`: merged local path and Dropbox URL setup into one integration form
 - `0.10.1`: fixed and cleaned Czech translations so the integration can be used in Czech or English cleanly
