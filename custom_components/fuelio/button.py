@@ -100,6 +100,8 @@ class FuelioButton(CoordinatorEntity[FuelioDataUpdateCoordinator], ButtonEntity)
             f"[Open Fuelio upload page]({upload_url})\n\n"
             f"Upload page: `{upload_url}`\n"
             f"Configured source: `{source_path}`\n\n"
+            "If a normal click opens the Home Assistant dashboard instead, open "
+            "the link in a new tab.\n\n"
             "Recommended workflow: close the setup form, then use this helper to "
             "open the upload page or use a stable Dropbox shared file link for "
             "remote CSV mode."
