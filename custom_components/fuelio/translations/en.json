@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Fuelio CSV import",
-        "description": "Choose the source type and then fill either a local CSV path or a Dropbox / remote CSV URL in this single setup form.",
+        "description": "Choose the source type and then fill either a local CSV path or a Dropbox / remote CSV URL in this single setup form.\n\n[Open upload page](/api/fuelio/upload-page)",
         "data": {
           "source_type": "Source type",
           "source_path": "CSV file or folder path",
