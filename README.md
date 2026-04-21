@@ -3,7 +3,7 @@
 FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV files through the Fuelino integration.
 
 <p align="center">
-  <img src="assets/fuelino-showcase.png" alt="Fuelino preview" width="360">
+  <img src="https://raw.githubusercontent.com/dzudzua/fuelinoHA/main/assets/fuelino-showcase.png" alt="Fuelino preview" width="360">
 </p>
 
 ## Version
