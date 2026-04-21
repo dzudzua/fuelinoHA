@@ -1,5 +1,17 @@
 # FuelinoHA
 
+[![Release](https://img.shields.io/github/v/release/dzudzua/fuelinoHA?display_name=tag)](https://github.com/dzudzua/fuelinoHA/releases)
+[![Stargazers](https://img.shields.io/github/stars/dzudzua/fuelinoHA?style=flat)](https://github.com/dzudzua/fuelinoHA/stargazers)
+[![HACS](https://img.shields.io/badge/HACS-Integration-41BDF5.svg)](https://hacs.xyz/)
+[![GitHub last release date](https://img.shields.io/github/release-date/dzudzua/fuelinoHA)](https://github.com/dzudzua/fuelinoHA/releases)
+[![GitHub last commit](https://img.shields.io/github/last-commit/dzudzua/fuelinoHA)](https://github.com/dzudzua/fuelinoHA/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/dzudzua/fuelinoHA)](https://github.com/dzudzua/fuelinoHA/graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/dzudzua/fuelinoHA)](https://github.com/dzudzua/fuelinoHA/network/members)
+[![Issues](https://img.shields.io/github/issues/dzudzua/fuelinoHA)](https://github.com/dzudzua/fuelinoHA/issues)
+[![Lines of code](https://img.shields.io/tokei/lines/github/dzudzua/fuelinoHA)](https://github.com/dzudzua/fuelinoHA)
+[![Code size](https://img.shields.io/github/repo-size/dzudzua/fuelinoHA)](https://github.com/dzudzua/fuelinoHA)
+[![MIT License](https://img.shields.io/github/license/dzudzua/fuelinoHA)](https://github.com/dzudzua/fuelinoHA/blob/main/LICENSE)
+
 FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV files through the Fuelino integration.
 
 <p align="center">
@@ -116,7 +128,7 @@ Keep personal CSV backups out of git and only point Home Assistant to local file
 
 If Fuelino helps you, you can support development here:
 
-[![Buy Me a Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://www.buymeacoffee.com/dzudzua)
+<a href="https://www.buymeacoffee.com/dzudzua" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me a Coffee" style="height: 60px !important;width: 217px !important;"></a>
 
 ## Tests
 
