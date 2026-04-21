@@ -100,8 +100,9 @@ class FuelioButton(CoordinatorEntity[FuelioDataUpdateCoordinator], ButtonEntity)
             f"[Open Fuelio upload page]({upload_url})\n\n"
             f"Upload page: `{upload_url}`\n"
             f"Configured source: `{source_path}`\n\n"
-            "Recommended workflow: use a local folder for manual uploads or a "
-            "stable Dropbox shared file link for remote CSV mode."
+            "Recommended workflow: close the setup form, then use this helper to "
+            "open the upload page or use a stable Dropbox shared file link for "
+            "remote CSV mode."
         )
         async_create(
             self.hass,

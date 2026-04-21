@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Fuelio CSV import",
-        "description": "Choose the source type and then fill the relevant field in this single setup form.\n\nTo upload a CSV from your computer, open `/fuelio-upload`.\nFor Dropbox, paste a shared CSV file link.\nFor local mode, enter a Home Assistant file or folder path.",
+        "description": "Use a local path or Dropbox URL. Upload from computer: `/fuelio-upload`. After setup, use the upload helper button.",
         "data": {
           "source_type": "Source type",
           "source_path": "CSV file or folder path",
@@ -60,7 +60,7 @@
   "entity": {
     "button": {
       "open_upload_page": {
-        "name": "Open upload help"
+        "name": "Open upload helper"
       },
       "reload_data": {
         "name": "Reload data"
