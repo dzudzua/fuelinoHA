@@ -1352,7 +1352,7 @@ def _favorite_station(vehicle: ParsedVehicle) -> str | None:
     values = [
         record.city or record.station_id
         for record in vehicle.records
-        if record.city or record.station_id
+        if _is_meaningful_location_label(record.city or record.station_id)
     ]
     if not values:
         return None
@@ -1361,7 +1361,11 @@ def _favorite_station(vehicle: ParsedVehicle) -> str | None:
 
 def _favorite_city(vehicle: ParsedVehicle) -> str | None:
     """Return the most frequent city."""
-    values = [record.city for record in vehicle.records if record.city]
+    values = [
+        record.city
+        for record in vehicle.records
+        if _is_meaningful_location_label(record.city)
+    ]
     if not values:
         return None
     return Counter(values).most_common(1)[0][0]
@@ -1369,7 +1373,11 @@ def _favorite_city(vehicle: ParsedVehicle) -> str | None:
 
 def _favorite_station_id(vehicle: ParsedVehicle) -> str | None:
     """Return the most frequent station id."""
-    values = [record.station_id for record in vehicle.records if record.station_id]
+    values = [
+        record.station_id
+        for record in vehicle.records
+        if _is_meaningful_location_label(record.station_id)
+    ]
     if not values:
         return None
     return Counter(values).most_common(1)[0][0]
@@ -1377,24 +1385,58 @@ def _favorite_station_id(vehicle: ParsedVehicle) -> str | None:
 
 def _different_stations_count(vehicle: ParsedVehicle) -> int:
     """Return the number of unique station ids."""
-    return len({record.station_id for record in vehicle.records if record.station_id})
+    return len(
+        {
+            record.station_id
+            for record in vehicle.records
+            if _is_meaningful_location_label(record.station_id)
+        }
+    )
 
 
 def _different_cities_count(vehicle: ParsedVehicle) -> int:
     """Return the number of unique cities."""
-    return len({record.city for record in vehicle.records if record.city})
+    return len(
+        {
+            record.city
+            for record in vehicle.records
+            if _is_meaningful_location_label(record.city)
+        }
+    )
 
 
 def _recent_cities(vehicle: ParsedVehicle, limit: int = 3) -> list[str]:
     """Return the most recent non-empty fill cities."""
     values: list[str] = []
     for record in reversed(vehicle.records):
-        if not record.city:
+        if not _is_meaningful_location_label(record.city):
             continue
         values.append(record.city)
         if len(values) >= limit:
             break
     return values
+
+
+def _is_meaningful_location_label(value: str | None) -> bool:
+    """Return whether a location-like label is meaningful for statistics."""
+    if not value:
+        return False
+
+    normalized = str(value).strip()
+    if not normalized:
+        return False
+
+    placeholder_values = {
+        "gps",
+        "unknown",
+        "n/a",
+        "na",
+        "-",
+        "--",
+        "none",
+        "null",
+    }
+    return normalized.casefold() not in placeholder_values
 
 
 def _data_span_days(vehicle: ParsedVehicle) -> int:
