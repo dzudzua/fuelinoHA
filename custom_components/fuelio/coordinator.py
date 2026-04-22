@@ -24,6 +24,7 @@ from .const import (
     SOURCE_TYPE_REMOTE_URL,
 )
 from .parser import ParsedVehicle, parse_vehicle_file, parse_vehicle_text
+from .remote import decode_remote_vehicle_text
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -140,7 +141,12 @@ class FuelioDataUpdateCoordinator(DataUpdateCoordinator[FuelioData]):
         session = async_get_clientsession(self.hass)
         async with session.get(download_url, allow_redirects=True) as response:
             response.raise_for_status()
-            text = await response.text(encoding="utf-8-sig", errors="ignore")
+            payload = await response.read()
+            text = decode_remote_vehicle_text(
+                remote_url,
+                payload,
+                response.headers.get("Content-Type"),
+            )
 
         parsed = await self.hass.async_add_executor_job(
             parse_vehicle_text,

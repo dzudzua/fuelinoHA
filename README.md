@@ -20,12 +20,13 @@ FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV fil
 
 ## Version
 
-Current integration version: `0.10.12`
+Current integration version: `0.10.13`
 
 ## What Fuelino supports
 
 - Fuelio CSV import from a local file or folder
 - Fuelio CSV import from a Dropbox / remote CSV URL
+- remote Dropbox `.csv.zip` backup support
 - automatic vehicle discovery from Fuelio exports
 - fuel statistics and driving analytics
 - city, station, weather and history insights
@@ -50,7 +51,7 @@ Recommended workflow:
    - local CSV file or folder
    - Dropbox / remote CSV URL
 4. If using a local folder, Fuelino will prefer the newest CSV per vehicle
-5. If using Dropbox, prefer a stable shared file link to one CSV such as `vehicle-1-sync.csv`
+5. If using Dropbox, use a stable shared file link to either `vehicle-1-sync.csv` or `vehicle-1-sync.csv.zip`
 
 If you keep replacing the same export or keep uploading newer CSV files into the folder, Fuelino will refresh on the configured scan interval.
 
@@ -97,7 +98,7 @@ Fuelino can read either:
 
 - one specific CSV file
 - one folder containing Fuelio CSV exports
-- one remote CSV URL, for example a Dropbox shared file link
+- one remote CSV or ZIP URL, for example a Dropbox shared file link
 
 When a folder is configured, it scans:
 
@@ -113,9 +114,10 @@ FuelinoHA supports a remote CSV URL mode intended for simple Dropbox-based setup
 Recommended approach:
 
 1. Open your Fuelio Dropbox backup folder
-2. Share one concrete CSV file, for example `vehicle-1-sync.csv`
+2. Share one concrete export file, for example `vehicle-1-sync.csv` or `vehicle-1-sync.csv.zip`
 3. Paste that shared link into the integration
 4. Fuelino will normalize Dropbox file links for direct download automatically
+5. If Dropbox only gives you a ZIP backup, Fuelino will open the archive and read the first matching CSV inside it
 
 This is best when Fuelio keeps updating the same file name.
 
@@ -140,6 +142,7 @@ python tools\inspect_fuelio_export.py hjundaj-1-2026-04-19_12-09.csv
 
 ## Changelog
 
+- `0.10.13`: added remote Dropbox ZIP export support so shared `vehicle-*-sync.csv.zip` links are downloaded, unpacked, and parsed automatically
 - `0.10.12`: consumption sensors now fall back to a derived volume-vs-odometer calculation when Fuelio exports do not include explicit consumption values, so average and recent consumption stats stay visible
 - `0.10.11`: improved Dropbox setup guidance with a direct file-link example and validation that catches Dropbox folder links before setup completes
 - `0.10.10`: polished entity naming, day units, pricing icons, and temperature unit handling so FuelinoHA feels more native in Home Assistant
