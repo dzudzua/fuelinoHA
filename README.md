@@ -20,7 +20,7 @@ FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV fil
 
 ## Version
 
-Current integration version: `0.10.13`
+Current integration version: `0.10.14`
 
 ## What Fuelino supports
 
@@ -31,6 +31,7 @@ Current integration version: `0.10.13`
 - fuel statistics and driving analytics
 - city, station, weather and history insights
 - non-fuel costs from Fuelio `Costs` and `CostCategories`
+- source metadata sensors for imported CSV file name and source reference
 - ready-to-adapt Lovelace dashboard example
 
 ## Recommended installation

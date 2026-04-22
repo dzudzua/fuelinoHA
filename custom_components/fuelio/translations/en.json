@@ -265,6 +265,12 @@
       },
       "average_trip_cost_per_km": {
         "name": "Average trip cost per distance"
+      },
+      "source_file_name": {
+        "name": "Source file name"
+      },
+      "source_reference": {
+        "name": "Source reference"
       }
     }
   }

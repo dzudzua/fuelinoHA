@@ -265,6 +265,13 @@
       "average_trip_cost_per_km": {
         "name": "Průměrná cena jízdy za vzdálenost"
       }
+      ,
+      "source_file_name": {
+        "name": "N\u00e1zev zdrojov\u00e9ho souboru"
+      },
+      "source_reference": {
+        "name": "Zdrojov\u00fd odkaz nebo cesta"
+      }
     }
   }
 }

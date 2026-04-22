@@ -6,8 +6,10 @@ from collections import Counter
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 import unicodedata
+from urllib.parse import urlparse
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -16,7 +18,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfLength, UnitOfTemperature, UnitOfTime
+from homeassistant.const import EntityCategory, UnitOfLength, UnitOfTemperature, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -575,6 +577,20 @@ SENSORS: tuple[FuelioSensorDescription, ...] = (
         suggested_display_precision=3,
         icon="mdi:car-speed-limiter",
         value_fn=lambda vehicle: _average_trip_cost_per_km(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="source_file_name",
+        translation_key="source_file_name",
+        icon="mdi:file-document-outline",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda vehicle: _source_file_name(vehicle),
+    ),
+    FuelioSensorDescription(
+        key="source_reference",
+        translation_key="source_reference",
+        icon="mdi:link-variant",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda vehicle: vehicle.source_file,
     ),
 )
 
@@ -1576,3 +1592,16 @@ def _safe_float(value: Any) -> float | None:
         return round(float(value), 2)
     except (TypeError, ValueError):
         return None
+
+
+def _source_file_name(vehicle: ParsedVehicle) -> str | None:
+    """Return the file name portion of the configured source."""
+    source = (vehicle.source_file or "").strip()
+    if not source:
+        return None
+
+    parsed = urlparse(source)
+    if parsed.scheme and parsed.netloc:
+        return Path(parsed.path).name or source
+
+    return Path(source).name or source
