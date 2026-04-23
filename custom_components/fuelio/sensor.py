@@ -764,6 +764,7 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         attrs: dict[str, Any] = {
             "vehicle_key": self._vehicle_key,
             "vehicle_name": self.vehicle.name,
+            "sensor_key": self.entity_description.key,
             "sensor_prefix": self._vehicle_key,
             "sensor_entity_prefix": f"sensor.{self._vehicle_key}_",
             "fuelino_vehicle_helper": self.entity_description.key == "vehicle_prefix",
