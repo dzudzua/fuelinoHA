@@ -755,6 +755,8 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         """Return diagnostic attributes."""
         latest = self.vehicle.records[-1]
         attrs: dict[str, Any] = {
+            "vehicle_key": self._vehicle_key,
+            "vehicle_name": self.vehicle.name,
             "source_file": self.vehicle.source_file,
             "record_count": len(self.vehicle.records),
             "latest_record_date": latest.occurred_on.isoformat(),

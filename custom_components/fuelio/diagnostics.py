@@ -20,7 +20,9 @@ async def async_get_config_entry_diagnostics(
         latest_expense = vehicle.expenses[-1] if vehicle.expenses else None
         latest_trip = vehicle.trips[-1] if vehicle.trips else None
         vehicles[key] = {
+            "vehicle_key": key,
             "name": vehicle.name,
+            "vehicle_name": vehicle.name,
             "source_file": vehicle.source_file,
             "record_count": len(vehicle.records),
             "expense_count": len(vehicle.expenses),
