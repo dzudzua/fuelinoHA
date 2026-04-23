@@ -37,6 +37,13 @@ class FuelioSensorDescription(SensorEntityDescription):
 
 SENSORS: tuple[FuelioSensorDescription, ...] = (
     FuelioSensorDescription(
+        key="vehicle_prefix",
+        translation_key="vehicle_prefix",
+        icon="mdi:identifier",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda vehicle: vehicle.key,
+    ),
+    FuelioSensorDescription(
         key="last_fill_date",
         translation_key="last_fill_date",
         device_class=SensorDeviceClass.DATE,
@@ -655,7 +662,7 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         return self.coordinator.data.vehicles[self._vehicle_key]
 
     @property
-    def native_value(self) -> date | Decimal | float | int | None:
+    def native_value(self) -> date | Decimal | float | int | str | None:
         """Return the current native value."""
         return self.entity_description.value_fn(self.vehicle)
 
@@ -757,6 +764,9 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         attrs: dict[str, Any] = {
             "vehicle_key": self._vehicle_key,
             "vehicle_name": self.vehicle.name,
+            "sensor_prefix": self._vehicle_key,
+            "sensor_entity_prefix": f"sensor.{self._vehicle_key}_",
+            "fuelino_vehicle_helper": self.entity_description.key == "vehicle_prefix",
             "source_file": self.vehicle.source_file,
             "record_count": len(self.vehicle.records),
             "latest_record_date": latest.occurred_on.isoformat(),

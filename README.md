@@ -20,7 +20,7 @@ FuelinoHA is a custom Home Assistant project for importing Fuelio backup CSV fil
 
 ## Version
 
-Current integration version: `0.10.16`
+Current integration version: `0.10.17`
 
 ## What Fuelino supports
 
@@ -143,6 +143,7 @@ python tools\inspect_fuelio_export.py hjundaj-1-2026-04-19_12-09.csv
 
 ## Changelog
 
+- `0.10.17`: added a per-vehicle diagnostic `vehicle_prefix` helper sensor so companion cards can discover the exact sensor prefix for each imported car without guessing
 - `0.10.16`: added `vehicle_name` and `vehicle_key` to Fuelino sensor diagnostic attributes and config-entry diagnostics so card tooling can identify vehicles more reliably
 - `0.10.13`: added remote Dropbox ZIP export support so shared `vehicle-*-sync.csv.zip` links are downloaded, unpacked, and parsed automatically
 - `0.10.12`: consumption sensors now fall back to a derived volume-vs-odometer calculation when Fuelio exports do not include explicit consumption values, so average and recent consumption stats stay visible

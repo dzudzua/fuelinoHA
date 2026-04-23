@@ -67,6 +67,9 @@
       }
     },
     "sensor": {
+      "vehicle_prefix": {
+        "name": "Prefix senzoru vozidla"
+      },
       "last_fill_date": {
         "name": "Datum posledního tankování"
       },

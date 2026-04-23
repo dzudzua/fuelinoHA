@@ -68,6 +68,9 @@
       }
     },
     "sensor": {
+      "vehicle_prefix": {
+        "name": "Vehicle sensor prefix"
+      },
       "last_fill_date": {
         "name": "Last fill date"
       },
