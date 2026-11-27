@@ -85,6 +85,18 @@ class FuelioParserTests(unittest.TestCase):
         self.assertAlmostEqual(latest_trip.distance_km, 95.114, places=3)
         self.assertAlmostEqual(latest_trip.trip_cost, 462.04438, places=5)
 
+    def test_same_day_fills_are_sorted_by_odometer(self) -> None:
+        """Reverse-ordered fills on one date must not produce negative distance."""
+        csv_text = (
+            "date,odometer,volume,cost\n"
+            "2026-04-22,222,6.07,250\n"
+            "2026-04-22,123,46.37,1850\n"
+        )
+        parsed = self.parser.parse_vehicle_text("test.csv", csv_text)
+        self.assertIsNotNone(parsed)
+        self.assertEqual([r.odometer for r in parsed.records], [123, 222])
+        self.assertEqual(parsed.records[-1].odometer - parsed.records[0].odometer, 99)
+
     def test_parse_vehicle_text_matches_file_parser(self) -> None:
         """Parsing raw CSV text should match file-based parsing."""
         text = SAMPLE_EXPORT.read_text(encoding="utf-8")
