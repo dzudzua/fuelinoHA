@@ -208,7 +208,7 @@ def _parse_sectioned_fuelio_file(path: Path, text: str) -> ParsedVehicle | None:
     if not records:
         return None
 
-    records.sort(key=lambda item: item.occurred_on)
+    records.sort(key=lambda item: (item.occurred_on, item.odometer is None, item.odometer or 0))
     base_name = vehicle_info.get("Name") or path.stem
     make = _clean_text(vehicle_info.get("Make"))
     model = _clean_text(vehicle_info.get("Model"))
@@ -295,7 +295,7 @@ def _parse_generic_csv_file(path: Path, text: str) -> ParsedVehicle | None:
     if not records:
         return None
 
-    records.sort(key=lambda item: item.occurred_on)
+    records.sort(key=lambda item: (item.occurred_on, item.odometer is None, item.odometer or 0))
     key = _slugify(vehicle_name or path.stem)
     return ParsedVehicle(
         key=key,

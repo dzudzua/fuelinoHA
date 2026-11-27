@@ -672,8 +672,8 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
         return self._vehicle_key in self.coordinator.data.vehicles
 
     @property
-    def suggested_unit_of_measurement(self) -> str | None:
-        """Return per-vehicle currency when relevant."""
+    def native_unit_of_measurement(self) -> str | None:
+        """Return the unit of the actual per-vehicle sensor value."""
         if self.entity_description.key == "last_fill_temperature":
             return UnitOfTemperature.CELSIUS
         if self.entity_description.key in {
@@ -755,7 +755,7 @@ class FuelioSensor(CoordinatorEntity[FuelioDataUpdateCoordinator], SensorEntity)
             fuel_unit = self.vehicle.fuel_unit or "L"
             distance_unit = self.vehicle.distance_unit or "km"
             return f"{fuel_unit}/100 {distance_unit}"
-        return None
+        return super().native_unit_of_measurement
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -1139,7 +1139,7 @@ def _distance_since_previous_fill(vehicle: ParsedVehicle) -> float | None:
     previous = vehicle.records[-2].odometer
     if latest is None or previous is None:
         return None
-    return round(latest - previous, 3)
+    return round(latest - previous, 3) if latest >= previous else None
 
 
 def _tracked_distance(vehicle: ParsedVehicle) -> float | None:
@@ -1151,7 +1151,7 @@ def _tracked_distance(vehicle: ParsedVehicle) -> float | None:
     earliest = vehicle.records[0].odometer
     if latest is None or earliest is None:
         return None
-    return round(latest - earliest, 3)
+    return round(latest - earliest, 3) if latest >= earliest else None
 
 
 def _sum_cost_since_days(vehicle: ParsedVehicle, days: int) -> float | None:
@@ -1208,7 +1208,7 @@ def _average_cost_per_km(vehicle: ParsedVehicle) -> float | None:
     """Return average cost per tracked distance unit."""
     total_cost = _sum_record_values(vehicle, "cost")
     tracked_distance = _tracked_distance(vehicle)
-    if not total_cost or not tracked_distance:
+    if total_cost is None or tracked_distance is None or tracked_distance <= 0:
         return None
     return round(total_cost / tracked_distance, 4)
 
@@ -1234,7 +1234,8 @@ def _average_distance_between_fills(vehicle: ParsedVehicle) -> float | None:
         previous = vehicle.records[index - 1].odometer
         if latest is None or previous is None:
             continue
-        deltas.append(latest - previous)
+        if latest >= previous:
+            deltas.append(latest - previous)
     if not deltas:
         return None
     return round(sum(deltas) / len(deltas), 3)
@@ -1252,7 +1253,8 @@ def _distance_current_month(vehicle: ParsedVehicle) -> float | None:
     ]
     if len(month_records) < 2:
         return None
-    return round(month_records[-1].odometer - month_records[0].odometer, 3)
+    delta = month_records[-1].odometer - month_records[0].odometer
+    return round(delta, 3) if delta >= 0 else None
 
 
 def _month_key(previous_month: bool = False) -> tuple[int, int]:
@@ -1357,7 +1359,8 @@ def _km_since_full_tank(vehicle: ParsedVehicle) -> float | None:
     latest = vehicle.records[-1]
     if last_full is None or latest.odometer is None or last_full.odometer is None:
         return None
-    return round(latest.odometer - last_full.odometer, 3)
+    delta = latest.odometer - last_full.odometer
+    return round(delta, 3) if delta >= 0 else None
 
 
 def _favorite_station(vehicle: ParsedVehicle) -> str | None:
